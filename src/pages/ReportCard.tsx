@@ -39,6 +39,16 @@ const ReportCard = () => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
 
+  const badges = useBadges({
+    totalRewrites: stats?.totalRewrites ?? 0,
+    totalWords: stats?.wordsPolished ?? 0,
+    streak: stats?.streak ?? 0,
+    bestScore: stats?.bestScore ?? null,
+    avgScore: stats?.avgScore ?? null,
+    uniqueContexts: stats?.contextBreakdown.length ?? 0,
+    daysPracticed: stats?.daysPracticed ?? 0,
+  });
+
   const period = stats
     ? `${formatDate(stats.firstDate)} – ${formatDate(stats.lastDate)}`
     : "";
