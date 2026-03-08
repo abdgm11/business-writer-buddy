@@ -22,14 +22,18 @@ Deno.serve(async (req) => {
 
     // Verify auth
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization header");
+    if (!authHeader?.startsWith("Bearer ")) throw new Error("Missing authorization header");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) throw new Error("Unauthorized");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: authError } = await supabase.auth.getClaims(token);
+    if (authError || !claimsData?.claims) throw new Error("Unauthorized");
+
+    const userEmail = claimsData.claims.email as string || "unknown";
+    const userId = claimsData.claims.sub as string;
 
     const { category, subject, message } = await req.json();
     if (!category || !subject || !message) {
