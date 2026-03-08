@@ -130,18 +130,35 @@ const Support = () => {
       return;
     }
 
-    // Send email notifications
+    // Send email notifications via direct fetch
     try {
-      const { data, error: fnError } = await supabase.functions.invoke("notify-support", {
-        body: { category, subject: subject.trim(), message: message.trim() },
-      });
-      if (fnError) {
-        console.error("Email notification error:", fnError);
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      if (accessToken) {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-support`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+            body: JSON.stringify({ category, subject: subject.trim(), message: message.trim() }),
+          }
+        );
+        const result = await res.json();
+        if (!res.ok) {
+          console.error("Email notification failed:", res.status, result);
+        } else {
+          console.log("Email notification sent:", result);
+        }
       } else {
-        console.log("Email notification sent:", data);
+        console.error("No active session for email notification");
       }
     } catch (err) {
-      console.error("Email notification failed:", err);
+      console.error("Email notification error:", err);
     }
 
     setSubmitting(false);
