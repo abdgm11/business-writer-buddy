@@ -97,7 +97,11 @@ Deno.serve(async (req) => {
 
     const order = await razorpayRes.json();
 
-    // Save order to DB (reuse adminClient from auth verification above)
+    // Save order to DB
+    const adminClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
     await adminClient.from("payments").insert({
       user_id: userId,
