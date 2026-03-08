@@ -83,7 +83,7 @@ serve(async (req) => {
         amount,
         currency: normalizedCurrency,
         receipt: `rcpt_${Date.now()}`,
-        notes: { user_id: user.id, plan },
+        notes: { user_id: userId, plan },
       }),
     });
 
