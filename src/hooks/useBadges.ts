@@ -33,7 +33,7 @@ interface BadgeInput {
   daysPracticed: number;
 }
 
-const BADGE_DEFS: Omit<Badge, "unlocked">[] & { check: (i: BadgeInput) => boolean }[] = [
+const BADGE_DEFS: (Omit<Badge, "unlocked"> & { check: (i: BadgeInput) => boolean })[] = [
   // Rewrite milestones
   { id: "first-write", name: "First Steps", description: "Complete your first rewrite", icon: Pen, tier: "bronze" as const, check: (i) => i.totalRewrites >= 1 },
   { id: "ten-rewrites", name: "Getting Warmed Up", description: "Complete 10 rewrites", icon: FileText, tier: "bronze" as const, check: (i) => i.totalRewrites >= 10 },
