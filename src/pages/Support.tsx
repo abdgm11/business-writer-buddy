@@ -213,7 +213,7 @@ const Support = () => {
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center gap-3 py-8 text-center"
             >
-              <CheckCircle2 className="h-12 w-12 text-green-500" />
+              <CheckCircle2 className="h-12 w-12 text-primary" />
               <h3 className="text-lg font-semibold text-foreground">Ticket Submitted!</h3>
               <p className="text-sm text-muted-foreground max-w-sm">
                 We've received your message and will get back to you within 24 hours via email.
