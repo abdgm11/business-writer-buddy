@@ -1,11 +1,12 @@
 import { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Sparkles, LayoutDashboard, PenTool, BookOpen, Settings, LogOut } from "lucide-react";
+import { Sparkles, LayoutDashboard, PenTool, BookOpen, Settings, LogOut, Award } from "lucide-react";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/coach", label: "Coach", icon: PenTool },
   { to: "/lessons", label: "Lessons", icon: BookOpen },
+  { to: "/report", label: "Report Card", icon: Award },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
