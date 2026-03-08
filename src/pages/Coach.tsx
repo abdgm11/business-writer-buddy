@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
-import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles } from "lucide-react";
+import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useRemainingRewrites } from "@/hooks/useRemainingRewrites";
 
 const tones = [
   { id: "formal", label: "Formal", desc: "Board-level language" },
@@ -36,6 +37,7 @@ interface RewriteResult {
 
 const Coach = () => {
   const { user } = useAuth();
+  const { remaining, used, limit, isPro, loading: quotaLoading, refetch: refetchQuota } = useRemainingRewrites();
   const [text, setText] = useState("");
   const [context, setContext] = useState("email");
   const [tone, setTone] = useState("formal");
@@ -93,6 +95,8 @@ const Coach = () => {
         await supabase.from("profiles").update({
           last_practice_at: new Date().toISOString(),
         }).eq("user_id", user.id);
+
+        refetchQuota();
       }
     } catch (e) {
       console.error("Rewrite error:", e);
@@ -108,6 +112,27 @@ const Coach = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Writing Coach</h1>
           <p className="text-muted-foreground mt-1">Paste your text, choose a context, and get professional rewrites with explanations.</p>
+
+          {user && !quotaLoading && !isPro && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-border bg-muted px-4 py-2.5 text-sm">
+              <Zap className="h-4 w-4 shrink-0 text-gold" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-foreground">{remaining}/{limit}</span> free rewrites remaining today.
+                {remaining === 0 && (
+                  <> <Link to="/settings" className="font-medium text-gold hover:underline">Upgrade to Pro</Link> for unlimited.</>
+                )}
+              </span>
+            </div>
+          )}
+
+          {user && !quotaLoading && isPro && (
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/5 px-4 py-2.5 text-sm">
+              <Sparkles className="h-4 w-4 shrink-0 text-gold" />
+              <span className="text-muted-foreground">
+                <span className="font-semibold text-gold">Pro</span> — Unlimited rewrites
+              </span>
+            </div>
+          )}
 
           {!user && (
             <div className="mt-3 flex items-center gap-2 rounded-lg border border-gold/30 bg-gold/5 px-4 py-2.5 text-sm">
