@@ -219,7 +219,13 @@ const Coach = () => {
                 <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
               </div>
               <div className="rounded-xl border-2 border-success bg-card p-5">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-success">Polished</p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-success">Polished</p>
+                  <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 px-2 text-xs gap-1.5">
+                    {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
                 <p className="text-sm text-foreground leading-relaxed">{result.polished}</p>
               </div>
             </div>
