@@ -173,19 +173,34 @@ const Landing = () => {
       {/* Pricing */}
       <section id="pricing" className="py-20">
         <div className="container">
-          <div className="mx-auto max-w-2xl text-center mb-16">
+          <div className="mx-auto max-w-2xl text-center mb-10">
             <h2 className="text-3xl font-bold text-foreground md:text-4xl mb-4">
               Simple, Transparent Pricing
             </h2>
             <p className="text-muted-foreground text-lg">Start free. Upgrade when you're ready.</p>
           </div>
+
+          {/* Billing toggle */}
+          <div className="mx-auto mb-12 flex items-center justify-center gap-3">
+            <span className={`text-sm font-medium ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
+            <button
+              onClick={() => setYearly(!yearly)}
+              className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors ${yearly ? "bg-gold" : "bg-border"}`}
+            >
+              <span className={`inline-block h-5 w-5 transform rounded-full bg-card shadow transition-transform ${yearly ? "translate-x-6" : "translate-x-1"}`} />
+            </button>
+            <span className={`text-sm font-medium ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
+              Yearly <span className="text-xs text-gold font-semibold">Save {savings}</span>
+            </span>
+          </div>
+
           <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
             {/* Free */}
             <div className="rounded-xl border bg-card p-8 shadow-elegant">
               <h3 className="text-lg font-semibold text-foreground font-sans mb-1">Free</h3>
               <p className="text-sm text-muted-foreground mb-6">Get started at no cost</p>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground font-display">$0</span>
+                <span className="text-4xl font-bold text-foreground font-display">{isIndia ? "₹0" : "$0"}</span>
                 <span className="text-muted-foreground">/month</span>
               </div>
               <ul className="mb-8 space-y-3">
@@ -207,8 +222,20 @@ const Landing = () => {
               <h3 className="text-lg font-semibold text-foreground font-sans mb-1">Pro</h3>
               <p className="text-sm text-muted-foreground mb-6">For serious professionals</p>
               <div className="mb-6">
-                <span className="text-4xl font-bold text-foreground font-display">$12</span>
-                <span className="text-muted-foreground">/month</span>
+                {yearly ? (
+                  <>
+                    <span className="text-4xl font-bold text-foreground font-display">{yearlyPrice}</span>
+                    <span className="text-muted-foreground">/year</span>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      That's just <span className="font-semibold text-gold">{yearlyMonthly}/mo</span>
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-4xl font-bold text-foreground font-display">{monthlyPrice}</span>
+                    <span className="text-muted-foreground">/month</span>
+                  </>
+                )}
               </div>
               <ul className="mb-8 space-y-3">
                 {["Unlimited rewrites", "All 5 contexts", "Color-coded explanations", "Full writing history", "Daily lessons", "Priority processing"].map((f) => (
