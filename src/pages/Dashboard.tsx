@@ -335,12 +335,12 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
-            className="rounded-xl border bg-card p-5 shadow-elegant"
+            className="rounded-xl border bg-card p-3 sm:p-5 shadow-elegant"
           >
-            <h3 className="text-sm font-semibold text-foreground mb-4">Writing Context Breakdown</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3 sm:mb-4">Writing Context Breakdown</h3>
             {contextBreakdown.length > 0 ? (
-              <div className="flex items-center gap-6">
-                <ResponsiveContainer width={140} height={140}>
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <ResponsiveContainer width={120} height={120} className="sm:!w-[140px] sm:!h-[140px] shrink-0">
                   <PieChart>
                     <Pie
                       data={contextBreakdown}
