@@ -156,7 +156,7 @@ const Coach = () => {
               {loading ? "Polishing..." : "Polish My Writing"} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <p className="text-xs text-muted-foreground">
-              {text.trim() ? `${text.trim().split(/\s+/).length} words` : ""}
+              {text.trim() ? `${text.trim().split(/\s+/).length} words · ${text.length} characters` : "0 words · 0 characters"}
             </p>
           </div>
         </div>
