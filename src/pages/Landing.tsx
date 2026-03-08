@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Check, Star, Globe, BookOpen, Zap, Shield } from "lucide-react";
@@ -15,6 +16,14 @@ const fadeUp = {
 };
 
 const Landing = () => {
+  const [totalRewrites, setTotalRewrites] = useState<number>(0);
+
+  useEffect(() => {
+    supabase.rpc("get_total_rewrites").then(({ data }) => {
+      if (data) setTotalRewrites(Number(data));
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}
@@ -84,6 +93,23 @@ const Landing = () => {
             </motion.p>
             <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
               <HeroDemoInput />
+            </motion.div>
+            <motion.div
+              custom={4}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="mt-10 inline-flex items-center gap-6 rounded-full border bg-card px-6 py-3 text-sm text-muted-foreground"
+            >
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-gold" />
+                <span className="font-semibold text-foreground">{totalRewrites.toLocaleString()}</span> texts polished
+              </div>
+              <div className="h-4 w-px bg-border" />
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-gold" />
+                80+ countries
+              </div>
             </motion.div>
           </div>
         </div>
