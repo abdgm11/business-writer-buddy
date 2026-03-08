@@ -134,31 +134,36 @@ const Support = () => {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData?.session?.access_token;
+      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-support`;
+
+      console.log("[NOTIFY] Starting email notification...");
+      console.log("[NOTIFY] Function URL:", fnUrl);
+      console.log("[NOTIFY] Has access token:", !!accessToken);
 
       if (accessToken) {
-        const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/notify-support`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-              apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            },
-            body: JSON.stringify({ category, subject: subject.trim(), message: message.trim() }),
-          }
-        );
-        const result = await res.json();
+        const res = await fetch(fnUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({ category, subject: subject.trim(), message: message.trim() }),
+        });
+        const resultText = await res.text();
+        console.log("[NOTIFY] Response status:", res.status);
+        console.log("[NOTIFY] Response body:", resultText);
+        
         if (!res.ok) {
-          console.error("Email notification failed:", res.status, result);
-        } else {
-          console.log("Email notification sent:", result);
+          toast.error(`Email notification failed (${res.status})`);
         }
       } else {
-        console.error("No active session for email notification");
+        console.log("[NOTIFY] No access token - skipping");
+        toast.error("No active session for email notification");
       }
-    } catch (err) {
-      console.error("Email notification error:", err);
+    } catch (err: any) {
+      console.error("[NOTIFY] Error:", err?.message || err);
+      toast.error(`Email notification error: ${err?.message}`);
     }
 
     setSubmitting(false);
