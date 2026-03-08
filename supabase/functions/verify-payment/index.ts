@@ -42,13 +42,15 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } }
     );
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
+    const token = authHeader.replace("Bearer ", "");
+    const { data, error: authError } = await supabase.auth.getClaims(token);
+    if (authError || !data?.claims) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const userId = data.claims.sub as string;
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await req.json();
 
@@ -86,7 +88,7 @@ serve(async (req) => {
         updated_at: new Date().toISOString(),
       })
       .eq("razorpay_order_id", razorpay_order_id)
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
 
     if (updateError) {
       console.error("Payment update error:", updateError);
