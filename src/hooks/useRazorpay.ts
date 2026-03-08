@@ -37,7 +37,7 @@ function loadRazorpayScript(): Promise<boolean> {
 export function useRazorpay() {
   const [loading, setLoading] = useState(false);
 
-  const checkout = async (currency: string, userEmail: string, userName: string, onSuccess?: () => void) => {
+  const checkout = async (currency: string, userEmail: string, userName: string, onSuccess?: () => void, plan: string = "pro_monthly") => {
     setLoading(true);
     try {
       const loaded = await loadRazorpayScript();
