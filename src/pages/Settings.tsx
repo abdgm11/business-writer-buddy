@@ -147,6 +147,29 @@ const Settings = () => {
                 </div>
                 <span className="rounded-full bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">Active</span>
               </div>
+              <div className="mt-4 pt-3 border-t border-border">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" disabled={cancelling} className="text-destructive hover:text-destructive">
+                      {cancelling ? "Cancelling..." : "Cancel Subscription"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel Pro subscription?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        You'll be downgraded to the Free plan immediately and limited to 3 rewrites per day. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep Pro</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleCancel} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Yes, cancel
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </div>
           ) : (
             <>
