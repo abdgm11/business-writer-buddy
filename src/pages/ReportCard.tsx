@@ -242,6 +242,10 @@ const ReportCard = () => {
               </div>
             )}
 
+
+            {/* Badges */}
+            <BadgesSection badges={badges} variant="report" />
+
             {/* Footer */}
             <div className="flex items-center justify-between pt-4 border-t">
               <div className="flex items-center gap-2">
