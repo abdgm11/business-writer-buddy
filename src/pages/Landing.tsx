@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Check, Star, Globe, BookOpen, Zap, Shield, Mail, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { HeroDemoInput } from "@/components/HeroDemoInput";
+import { LandingNavbar } from "@/components/LandingNavbar";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
