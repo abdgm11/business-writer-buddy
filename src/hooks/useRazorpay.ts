@@ -37,7 +37,7 @@ function loadRazorpayScript(): Promise<boolean> {
 export function useRazorpay() {
   const [loading, setLoading] = useState(false);
 
-  const checkout = async (currency: string, userEmail: string, userName: string, onSuccess?: () => void) => {
+  const checkout = async (currency: string, userEmail: string, userName: string, onSuccess?: () => void, plan: string = "pro_monthly") => {
     setLoading(true);
     try {
       const loaded = await loadRazorpayScript();
@@ -56,7 +56,7 @@ export function useRazorpay() {
       }
 
       const { data, error } = await supabase.functions.invoke("create-order", {
-        body: { currency, plan: "pro" },
+        body: { currency, plan },
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -72,7 +72,7 @@ export function useRazorpay() {
         amount: data.amount,
         currency: data.currency,
         name: "ProseAI",
-        description: "Pro Plan — Monthly",
+        description: plan === "pro_yearly" ? "Pro Plan — Yearly" : "Pro Plan — Monthly",
         order_id: data.order_id,
         prefill: {
           email: userEmail,
