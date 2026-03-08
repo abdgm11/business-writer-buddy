@@ -20,23 +20,21 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Verify JWT with getClaims()
-    const token = authHeader.replace("Bearer ", "");
-    const supabaseAuth = createClient(
+    // Verify JWT with getUser() - cryptographic server-side verification
+    const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
-    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims?.sub) {
+    const { data: { user }, error: userError } = await adminClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (userError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userId = claimsData.claims.sub as string;
-    const userEmail = (claimsData.claims.email || "") as string;
+    const userId = user.id;
+    const userEmail = user.email || "";
 
     const { currency = "INR", plan = "pro" } = await req.json();
 
