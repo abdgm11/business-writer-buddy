@@ -72,11 +72,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Update payment record
-    const adminClient = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    // Update payment record (reuse adminClient from auth verification above)
 
     const { error: updateError } = await adminClient
       .from("payments")
