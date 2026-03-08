@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { gtagEvent } from "@/lib/gtag";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
@@ -31,10 +32,12 @@ const Login = () => {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
+        gtagEvent("sign_up", { method: "email" });
         toast.success("Check your email to confirm your account!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        gtagEvent("login", { method: "email" });
         navigate("/dashboard");
       }
     } catch (error: any) {
@@ -50,6 +53,8 @@ const Login = () => {
     });
     if (error) {
       toast.error("Google sign-in failed. Please try again.");
+    } else {
+      gtagEvent("login", { method: "google" });
     }
   };
 

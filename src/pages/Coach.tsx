@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { gtagEvent } from "@/lib/gtag";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
@@ -76,6 +77,7 @@ const Coach = () => {
 
       const rewriteResult: RewriteResult = { polished: data.polished, corrections: data.corrections };
       setResult(rewriteResult);
+      gtagEvent("rewrite_submit", { context, tone, word_count: wordCount });
 
       // History is now saved server-side in the edge function
       if (user) {
