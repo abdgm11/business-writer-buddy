@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useRazorpay } from "@/hooks/useRazorpay";
+import { useUserPlan } from "@/hooks/useUserPlan";
 import { PaymentHistory } from "@/components/PaymentHistory";
 
 const Settings = () => {
@@ -14,6 +15,7 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
   const { checkout, loading: paymentLoading, SUPPORTED_CURRENCIES } = useRazorpay();
+  const { isPro, loading: planLoading } = useUserPlan();
 
   useEffect(() => {
     if (!user) return;
@@ -94,22 +96,14 @@ const Settings = () => {
         {/* Subscription */}
         <div className="rounded-xl border bg-card p-6 shadow-elegant">
           <h2 className="text-lg font-semibold text-foreground font-sans mb-4">Subscription</h2>
-          <div className="rounded-lg bg-muted p-4 mb-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-foreground">Free Plan</p>
-                <p className="text-sm text-muted-foreground">3 rewrites per day</p>
-              </div>
-              <span className="rounded-full bg-muted-foreground/10 px-3 py-1 text-xs font-medium text-muted-foreground">Current</span>
-            </div>
-          </div>
-          <div className="rounded-lg border-2 border-gold p-4">
-            <div className="flex flex-col gap-4">
+
+          {planLoading ? (
+            <p className="text-sm text-muted-foreground">Loading plan...</p>
+          ) : isPro ? (
+            <div className="rounded-lg border-2 border-gold p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-foreground">
-                    Pro Plan — {displayPrices[selectedCurrency] || displayPrices.INR}/month
-                  </p>
+                  <p className="font-semibold text-foreground">Pro Plan</p>
                   <ul className="mt-2 space-y-1">
                     {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
                       <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -118,35 +112,66 @@ const Settings = () => {
                     ))}
                   </ul>
                 </div>
+                <span className="rounded-full bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">Active</span>
               </div>
-
-              {/* Currency selector */}
-              <div className="flex items-center gap-3">
-                <label className="text-sm font-medium text-foreground">Currency:</label>
-                <select
-                  value={selectedCurrency}
-                  onChange={(e) => setSelectedCurrency(e.target.value)}
-                  className="rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  {SUPPORTED_CURRENCIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.symbol} — {c.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <Button
-                variant="gold"
-                size="sm"
-                onClick={handleUpgrade}
-                disabled={paymentLoading}
-                className="w-fit"
-              >
-                {paymentLoading ? "Processing..." : "Upgrade Now"}
-              </Button>
             </div>
-        </div>
+          ) : (
+            <>
+              <div className="rounded-lg bg-muted p-4 mb-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-foreground">Free Plan</p>
+                    <p className="text-sm text-muted-foreground">3 rewrites per day</p>
+                  </div>
+                  <span className="rounded-full bg-muted-foreground/10 px-3 py-1 text-xs font-medium text-muted-foreground">Current</span>
+                </div>
+              </div>
+              <div className="rounded-lg border-2 border-gold p-4">
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        Pro Plan — {displayPrices[selectedCurrency] || displayPrices.INR}/month
+                      </p>
+                      <ul className="mt-2 space-y-1">
+                        {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
+                          <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Check className="h-3 w-3 text-gold" /> {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Currency selector */}
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-medium text-foreground">Currency:</label>
+                    <select
+                      value={selectedCurrency}
+                      onChange={(e) => setSelectedCurrency(e.target.value)}
+                      className="rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      {SUPPORTED_CURRENCIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.symbol} — {c.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <Button
+                    variant="gold"
+                    size="sm"
+                    onClick={handleUpgrade}
+                    disabled={paymentLoading}
+                    className="w-fit"
+                  >
+                    {paymentLoading ? "Processing..." : "Upgrade Now"}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
 
         {/* Payment History */}
         <PaymentHistory />
