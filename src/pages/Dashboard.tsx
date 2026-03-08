@@ -237,51 +237,51 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {stats.map((s, i) => (
             <motion.div
               key={s.label}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.08 }}
-              className="rounded-xl border bg-card p-5 shadow-elegant"
+              className="rounded-xl border bg-card p-3 sm:p-5 shadow-elegant"
             >
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-muted-foreground">{s.label}</p>
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
-                  <s.icon className="h-4 w-4 text-gold" />
+              <div className="flex items-center justify-between mb-2 sm:mb-3">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-tight">{s.label}</p>
+                <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg bg-muted shrink-0">
+                  <s.icon className="h-3 w-3 sm:h-4 sm:w-4 text-gold" />
                 </div>
               </div>
-              <p className="text-2xl font-bold text-foreground font-display">{s.value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{s.change}</p>
+              <p className="text-xl sm:text-2xl font-bold text-foreground font-display">{s.value}</p>
+              <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground hidden sm:block">{s.change}</p>
             </motion.div>
           ))}
         </div>
 
         {/* Charts Row */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           {/* Weekly Activity */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className="rounded-xl border bg-card p-5 shadow-elegant"
+            className="rounded-xl border bg-card p-3 sm:p-5 shadow-elegant"
           >
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <BarChart3 className="h-4 w-4 text-gold" />
               <h3 className="text-sm font-semibold text-foreground">Weekly Activity</h3>
             </div>
             {weeklyActivity.some((d) => d.rewrites > 0) ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <BarChart data={weeklyActivity}>
-                  <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" allowDecimals={false} />
+              <ResponsiveContainer width="100%" height={160} className="sm:!h-[200px]">
+                <BarChart data={weeklyActivity} margin={{ left: -10, right: 4, top: 4, bottom: 0 }}>
+                  <XAxis dataKey="day" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" allowDecimals={false} width={28} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="rewrites" name="Rewrites" fill="hsl(var(--gold))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[200px] text-sm text-muted-foreground">
+              <div className="flex items-center justify-center h-[160px] sm:h-[200px] text-sm text-muted-foreground">
                 No activity this week yet
               </div>
             )}
@@ -292,23 +292,23 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 }}
-            className="rounded-xl border bg-card p-5 shadow-elegant"
+            className="rounded-xl border bg-card p-3 sm:p-5 shadow-elegant"
           >
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <TrendingUp className="h-4 w-4 text-gold" />
               <h3 className="text-sm font-semibold text-foreground">Score Trend</h3>
             </div>
             {scoreTrend.length > 1 ? (
-              <ResponsiveContainer width="100%" height={200}>
-                <AreaChart data={scoreTrend}>
+              <ResponsiveContainer width="100%" height={160} className="sm:!h-[200px]">
+                <AreaChart data={scoreTrend} margin={{ left: -10, right: 4, top: 4, bottom: 0 }}>
                   <defs>
                     <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="hsl(var(--gold))" stopOpacity={0.3} />
                       <stop offset="95%" stopColor="hsl(var(--gold))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <XAxis dataKey="date" tick={{ fontSize: 9 }} stroke="hsl(var(--muted-foreground))" interval="preserveStartEnd" />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" width={28} />
                   <Tooltip content={<CustomTooltip />} />
                   <Area
                     type="monotone"
@@ -321,7 +321,7 @@ const Dashboard = () => {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[200px] text-sm text-muted-foreground">
+              <div className="flex items-center justify-center h-[160px] sm:h-[200px] text-sm text-muted-foreground">
                 Need at least 2 scored rewrites
               </div>
             )}
@@ -329,18 +329,18 @@ const Dashboard = () => {
         </div>
 
         {/* Breakdowns Row */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           {/* Context Breakdown */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.35 }}
-            className="rounded-xl border bg-card p-5 shadow-elegant"
+            className="rounded-xl border bg-card p-3 sm:p-5 shadow-elegant"
           >
-            <h3 className="text-sm font-semibold text-foreground mb-4">Writing Context Breakdown</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3 sm:mb-4">Writing Context Breakdown</h3>
             {contextBreakdown.length > 0 ? (
-              <div className="flex items-center gap-6">
-                <ResponsiveContainer width={140} height={140}>
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                <ResponsiveContainer width={120} height={120} className="sm:!w-[140px] sm:!h-[140px] shrink-0">
                   <PieChart>
                     <Pie
                       data={contextBreakdown}
@@ -382,11 +382,11 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="rounded-xl border bg-card p-5 shadow-elegant"
+            className="rounded-xl border bg-card p-3 sm:p-5 shadow-elegant"
           >
-            <h3 className="text-sm font-semibold text-foreground mb-4">Tone Usage</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3 sm:mb-4">Tone Usage</h3>
             {toneBreakdown.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {toneBreakdown.map((item, i) => {
                   const max = toneBreakdown[0].value;
                   return (
