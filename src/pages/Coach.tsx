@@ -37,6 +37,7 @@ interface RewriteResult {
 
 const Coach = () => {
   const { user } = useAuth();
+  const { remaining, used, limit, isPro, loading: quotaLoading, refetch: refetchQuota } = useRemainingRewrites();
   const [text, setText] = useState("");
   const [context, setContext] = useState("email");
   const [tone, setTone] = useState("formal");
