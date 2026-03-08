@@ -77,21 +77,9 @@ const Coach = () => {
       const rewriteResult: RewriteResult = { polished: data.polished, corrections: data.corrections };
       setResult(rewriteResult);
 
-      // Save to history
+      // History is now saved server-side in the edge function
       if (user) {
-        const wordCount = text.trim().split(/\s+/).length;
-        await supabase.from("rewrites").insert({
-          user_id: user.id,
-          original_text: text.trim(),
-          polished_text: data.polished,
-          corrections: data.corrections,
-          context,
-          tone,
-          word_count: wordCount,
-          score: Math.min(100, 70 + data.corrections.length * 5),
-        });
-
-        // Update streak
+        // Update streak client-side (non-security-sensitive)
         await supabase.from("profiles").update({
           last_practice_at: new Date().toISOString(),
         }).eq("user_id", user.id);
