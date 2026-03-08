@@ -37,6 +37,7 @@ const Login = () => {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        gtagEvent("login", { method: "email" });
         navigate("/dashboard");
       }
     } catch (error: any) {
