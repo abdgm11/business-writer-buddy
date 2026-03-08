@@ -25,6 +25,7 @@ const Settings = () => {
   const [displayName, setDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
+  const [cancelling, setCancelling] = useState(false);
   const { checkout, loading: paymentLoading, SUPPORTED_CURRENCIES } = useRazorpay();
   const { isPro, loading: planLoading, refetch: refetchPlan } = useUserPlan();
 
