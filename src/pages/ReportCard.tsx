@@ -3,6 +3,8 @@ import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useReportCardData } from "@/hooks/useReportCardData";
+import { useBadges } from "@/hooks/useBadges";
+import { BadgesSection } from "@/components/BadgesSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
