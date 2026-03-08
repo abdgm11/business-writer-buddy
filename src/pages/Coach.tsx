@@ -77,6 +77,7 @@ const Coach = () => {
 
       const rewriteResult: RewriteResult = { polished: data.polished, corrections: data.corrections };
       setResult(rewriteResult);
+      gtagEvent("rewrite_submit", { context, tone, word_count: wordCount });
 
       // History is now saved server-side in the edge function
       if (user) {

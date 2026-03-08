@@ -53,6 +53,8 @@ const Login = () => {
     });
     if (error) {
       toast.error("Google sign-in failed. Please try again.");
+    } else {
+      gtagEvent("login", { method: "google" });
     }
   };
 

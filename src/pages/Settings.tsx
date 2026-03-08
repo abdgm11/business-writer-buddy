@@ -62,7 +62,11 @@ const Settings = () => {
   const handleUpgrade = () => {
     if (!user) return;
     const plan = yearly ? "pro_yearly" : "pro_monthly";
-    checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan, plan);
+    gtagEvent("begin_checkout", { plan, currency: selectedCurrency });
+    checkout(selectedCurrency, user.email || "", displayName || user.email || "", () => {
+      gtagEvent("purchase", { plan, currency: selectedCurrency });
+      refetchPlan();
+    }, plan);
   };
 
   const handleCancel = async () => {
