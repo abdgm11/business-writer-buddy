@@ -37,7 +37,7 @@ function loadRazorpayScript(): Promise<boolean> {
 export function useRazorpay() {
   const [loading, setLoading] = useState(false);
 
-  const checkout = async (currency: string, userEmail: string, userName: string) => {
+  const checkout = async (currency: string, userEmail: string, userName: string, onSuccess?: () => void) => {
     setLoading(true);
     try {
       const loaded = await loadRazorpayScript();
@@ -96,6 +96,7 @@ export function useRazorpay() {
             toast.error("Payment verification failed. Contact support.");
           } else {
             toast.success("Payment successful! Welcome to Pro 🎉");
+            onSuccess?.();
           }
         },
         modal: {

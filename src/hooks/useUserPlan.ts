@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -7,27 +7,27 @@ export function useUserPlan() {
   const [isPro, setIsPro] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchPlan = useCallback(async () => {
     if (!user) {
       setLoading(false);
       return;
     }
+    setLoading(true);
+    const { data } = await supabase
+      .from("payments")
+      .select("status, plan")
+      .eq("user_id", user.id)
+      .eq("status", "paid")
+      .eq("plan", "pro")
+      .limit(1);
 
-    const fetchPlan = async () => {
-      const { data } = await supabase
-        .from("payments")
-        .select("status, plan")
-        .eq("user_id", user.id)
-        .eq("status", "paid")
-        .eq("plan", "pro")
-        .limit(1);
-
-      setIsPro((data?.length ?? 0) > 0);
-      setLoading(false);
-    };
-
-    fetchPlan();
+    setIsPro((data?.length ?? 0) > 0);
+    setLoading(false);
   }, [user]);
 
-  return { isPro, loading };
+  useEffect(() => {
+    fetchPlan();
+  }, [fetchPlan]);
+
+  return { isPro, loading, refetch: fetchPlan };
 }

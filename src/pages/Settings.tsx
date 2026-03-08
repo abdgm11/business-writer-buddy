@@ -15,7 +15,7 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
   const { checkout, loading: paymentLoading, SUPPORTED_CURRENCIES } = useRazorpay();
-  const { isPro, loading: planLoading } = useUserPlan();
+  const { isPro, loading: planLoading, refetch: refetchPlan } = useUserPlan();
 
   useEffect(() => {
     if (!user) return;
@@ -47,7 +47,7 @@ const Settings = () => {
 
   const handleUpgrade = () => {
     if (!user) return;
-    checkout(selectedCurrency, user.email || "", displayName || user.email || "");
+    checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan);
   };
 
   const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
