@@ -2,11 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
-import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles } from "lucide-react";
+import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useRemainingRewrites } from "@/hooks/useRemainingRewrites";
 
 const tones = [
   { id: "formal", label: "Formal", desc: "Board-level language" },
