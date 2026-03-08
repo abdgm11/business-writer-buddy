@@ -60,7 +60,8 @@ const Settings = () => {
 
   const handleUpgrade = () => {
     if (!user) return;
-    checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan);
+    const plan = yearly ? "pro_yearly" : "pro_monthly";
+    checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan, plan);
   };
 
   const handleCancel = async () => {
