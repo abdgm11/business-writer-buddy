@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Check, Star, Globe, BookOpen, Zap, Shield } from "lucide-react";
+import { ArrowRight, Sparkles, Check, Star, Globe, BookOpen, Zap, Shield, Mail, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { HeroDemoInput } from "@/components/HeroDemoInput";
 
