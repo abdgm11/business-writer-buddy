@@ -11,39 +11,26 @@ const MAX_CHARS = 3000;
 const ALLOWED_CONTEXTS = ["email", "report", "presentation", "linkedin", "slack"];
 const ALLOWED_TONES = ["formal", "friendly", "assertive", "diplomatic"];
 
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length < 2) return null;
-    let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    while (base64.length % 4) base64 += "=";
-    return JSON.parse(atob(base64));
-  } catch {
-    return null;
-  }
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // --- Auth: extract user ID from JWT ---
+    // --- Auth: verify JWT with getClaims() ---
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.replace("Bearer ", "");
-      const claims = decodeJwtPayload(token);
-      if (claims) {
-        const sub = claims.sub as string | undefined;
-        if (sub && claims.aud === "authenticated") {
-          const exp = claims.exp as number | undefined;
-          if (!exp || exp * 1000 > Date.now()) {
-            userId = sub;
-          }
-        }
+      const supabaseAuth = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const { data, error } = await supabaseAuth.auth.getClaims(token);
+      if (!error && data?.claims?.sub) {
+        userId = data.claims.sub as string;
       }
     }
 

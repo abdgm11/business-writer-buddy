@@ -36,33 +36,22 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Verify JWT with getClaims()
     const token = authHeader.replace("Bearer ", "");
-    const payloadBase64 = token.split(".")[1];
-    if (!payloadBase64) {
-      return new Response(JSON.stringify({ error: "Invalid token" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    let claims: { sub?: string; exp?: number };
-    try {
-      claims = JSON.parse(atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/")));
-    } catch {
-      return new Response(JSON.stringify({ error: "Invalid token format" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    if (!claims.sub || (claims.exp && claims.exp * 1000 < Date.now())) {
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const userId = claims.sub;
+    const userId = claimsData.claims.sub as string;
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await req.json();
 
