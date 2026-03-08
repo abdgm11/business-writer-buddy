@@ -310,7 +310,7 @@ const Landing = () => {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="rounded-xl border bg-card p-6 shadow-elegant hover:shadow-lg transition-shadow"
+                className="rounded-xl border bg-card p-5 sm:p-6 shadow-elegant hover:shadow-lg transition-shadow"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted mb-4">
                   <tip.icon className="h-5 w-5 text-gold" />
