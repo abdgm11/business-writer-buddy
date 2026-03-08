@@ -14,30 +14,34 @@ serve(async (req) => {
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
+    // Validate user by calling the auth API directly
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
+      headers: {
+        Authorization: authHeader,
+        apikey: Deno.env.get("SUPABASE_ANON_KEY")!,
+      },
+    });
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    if (authError || !user) {
-      console.error("Auth error:", authError?.message);
+    if (!userRes.ok) {
+      const errText = await userRes.text();
+      console.error("Auth validation failed:", userRes.status, errText);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const userId = user.id;
-    const userEmail = user.email || "";
+
+    const authUser = await userRes.json();
+    const userId = authUser.id as string;
+    const userEmail = (authUser.email || "") as string;
 
     const { currency = "INR", plan = "pro" } = await req.json();
 
