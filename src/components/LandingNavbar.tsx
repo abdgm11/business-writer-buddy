@@ -51,6 +51,7 @@ export const LandingNavbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle />
           <Link to="/login">
             <Button variant="ghost" size="sm">Log in</Button>
           </Link>
