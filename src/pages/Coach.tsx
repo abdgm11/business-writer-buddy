@@ -2,7 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
-import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare } from "lucide-react";
+import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2 } from "lucide-react";
+
+const tones = [
+  { id: "formal", label: "Formal", desc: "Board-level language" },
+  { id: "friendly", label: "Friendly-Professional", desc: "Warm but polished" },
+  { id: "assertive", label: "Assertive", desc: "Direct and confident" },
+  { id: "diplomatic", label: "Diplomatic", desc: "Tactful and careful" },
+] as const;
 
 const contexts = [
   { id: "email", label: "Email", icon: Mail },
@@ -26,6 +33,7 @@ const mockResult = {
 const Coach = () => {
   const [text, setText] = useState("");
   const [context, setContext] = useState("email");
+  const [tone, setTone] = useState("formal");
   const [result, setResult] = useState<typeof mockResult | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -62,6 +70,30 @@ const Coach = () => {
               {c.label}
             </button>
           ))}
+        </div>
+
+        {/* Tone Selector */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">Tone</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {tones.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTone(t.id)}
+                className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
+                  tone === t.id
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50"
+                }`}
+                title={t.desc}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Input */}
