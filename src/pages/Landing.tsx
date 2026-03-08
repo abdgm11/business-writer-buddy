@@ -17,12 +17,27 @@ const fadeUp = {
 
 const Landing = () => {
   const [totalRewrites, setTotalRewrites] = useState<number>(0);
+  const [isIndia, setIsIndia] = useState(false);
+  const [yearly, setYearly] = useState(false);
 
   useEffect(() => {
     supabase.rpc("get_total_rewrites").then(({ data }) => {
       if (data) setTotalRewrites(Number(data));
     });
+
+    // Geo-detect for pricing
+    fetch("https://ipapi.co/json/")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.country_code === "IN") setIsIndia(true);
+      })
+      .catch(() => {});
   }, []);
+
+  const monthlyPrice = isIndia ? "₹299" : "$12";
+  const yearlyPrice = isIndia ? "₹2,499" : "$99";
+  const yearlyMonthly = isIndia ? "₹208" : "$8.25";
+  const savings = "30%";
 
   return (
     <div className="min-h-screen bg-background">
