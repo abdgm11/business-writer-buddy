@@ -37,12 +37,12 @@ Deno.serve(async (req) => {
     const userId = user.id;
     const userEmail = user.email || "";
 
-    const { currency = "INR", plan = "pro" } = await req.json();
+    const { currency = "INR", plan = "pro_monthly" } = await req.json();
 
     // Price in smallest currency unit (paise for INR, cents for USD, etc.)
     const priceMap: Record<string, Record<string, number>> = {
-      pro: {
-        INR: 99900,   // ₹999
+      pro_monthly: {
+        INR: 29900,   // ₹299
         USD: 1200,    // $12
         EUR: 1100,    // €11
         GBP: 1000,    // £10
@@ -50,7 +50,18 @@ Deno.serve(async (req) => {
         CAD: 1600,    // C$16
         SGD: 1600,    // S$16
         AED: 4500,    // 45 AED
-        JPY: 1800,    // ¥1800 (JPY has no subunits)
+        JPY: 1800,    // ¥1800
+      },
+      pro_yearly: {
+        INR: 249900,  // ₹2,499
+        USD: 9900,    // $99
+        EUR: 9200,    // €92
+        GBP: 8400,    // £84
+        AUD: 15100,   // A$151
+        CAD: 13400,   // C$134
+        SGD: 13400,   // S$134
+        AED: 37800,   // 378 AED
+        JPY: 15100,   // ¥15,100
       },
     };
 

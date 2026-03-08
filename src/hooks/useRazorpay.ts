@@ -72,7 +72,7 @@ export function useRazorpay() {
         amount: data.amount,
         currency: data.currency,
         name: "ProseAI",
-        description: "Pro Plan — Monthly",
+        description: plan === "pro_yearly" ? "Pro Plan — Yearly" : "Pro Plan — Monthly",
         order_id: data.order_id,
         prefill: {
           email: userEmail,
