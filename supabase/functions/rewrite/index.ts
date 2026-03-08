@@ -228,7 +228,7 @@ You must respond using the "rewrite_text" tool.`;
   } catch (e) {
     console.error("rewrite error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
