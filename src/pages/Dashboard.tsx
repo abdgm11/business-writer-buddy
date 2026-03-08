@@ -382,11 +382,11 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="rounded-xl border bg-card p-5 shadow-elegant"
+            className="rounded-xl border bg-card p-3 sm:p-5 shadow-elegant"
           >
-            <h3 className="text-sm font-semibold text-foreground mb-4">Tone Usage</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3 sm:mb-4">Tone Usage</h3>
             {toneBreakdown.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 {toneBreakdown.map((item, i) => {
                   const max = toneBreakdown[0].value;
                   return (
