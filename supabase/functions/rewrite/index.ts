@@ -112,36 +112,28 @@ Deno.serve(async (req) => {
         }
       }
     } else {
-      // Anonymous user: enforce per-IP rate limit
+      // Anonymous user: enforce per-IP rate limit using Deno KV (distributed)
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-      const now = Date.now();
-      const entry = anonRateLimiter.get(ip);
+      const kvKey = ["anon_rate", ip];
+      const entry = await kv.get<number>(kvKey);
+      const currentCount = entry.value ?? 0;
 
-      if (entry && now < entry.resetAt) {
-        if (entry.count >= ANON_DAILY_LIMIT) {
-          return new Response(
-            JSON.stringify({
-              error: "Rate limit reached",
-              message: "Anonymous usage is limited. Sign in for more rewrites.",
-              limit_reached: true,
-            }),
-            {
-              status: 429,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            }
-          );
-        }
-        entry.count++;
-      } else {
-        anonRateLimiter.set(ip, { count: 1, resetAt: now + ANON_WINDOW_MS });
+      if (currentCount >= ANON_DAILY_LIMIT) {
+        return new Response(
+          JSON.stringify({
+            error: "Rate limit reached",
+            message: "Anonymous usage is limited. Sign in for more rewrites.",
+            limit_reached: true,
+          }),
+          {
+            status: 429,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
       }
 
-      // Cleanup old entries periodically
-      if (anonRateLimiter.size > 10000) {
-        for (const [key, val] of anonRateLimiter) {
-          if (now >= val.resetAt) anonRateLimiter.delete(key);
-        }
-      }
+      // Increment counter with TTL-based expiry
+      await kv.set(kvKey, currentCount + 1, { expireIn: ANON_WINDOW_MS });
     }
 
     // --- AI rewrite ---
