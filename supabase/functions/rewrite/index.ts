@@ -7,9 +7,14 @@ const corsHeaders = {
 };
 
 const FREE_DAILY_LIMIT = 3;
+const ANON_DAILY_LIMIT = 2;
 const MAX_CHARS = 3000;
 const ALLOWED_CONTEXTS = ["email", "report", "presentation", "linkedin", "slack"];
 const ALLOWED_TONES = ["formal", "friendly", "assertive", "diplomatic"];
+
+// Simple in-memory rate limiter for anonymous users (per-IP)
+const anonRateLimiter = new Map<string, { count: number; resetAt: number }>();
+const ANON_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
