@@ -66,8 +66,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const userId = claims.sub;
-    const userEmail = claims.email || "";
+    const userEmail = (claims.email || "") as string;
     console.log("Authenticated user:", userId);
 
     const { currency = "INR", plan = "pro" } = await req.json();
