@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { gtagEvent } from "@/lib/gtag";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";

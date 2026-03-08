@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { gtagEvent } from "@/lib/gtag";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
