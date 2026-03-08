@@ -146,8 +146,11 @@ const Settings = () => {
                 {paymentLoading ? "Processing..." : "Upgrade Now"}
               </Button>
             </div>
-          </div>
         </div>
+
+        {/* Payment History */}
+        <PaymentHistory />
+      </div>
       </div>
     </AppLayout>
   );
