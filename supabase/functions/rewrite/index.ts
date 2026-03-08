@@ -247,6 +247,18 @@ You must respond using the "rewrite_text" tool.`;
 
     const result = JSON.parse(toolCall.function.arguments);
 
+    // Sanitize AI output to prevent stored XSS
+    if (result.polished) {
+      result.polished = sanitizeText(result.polished);
+    }
+    if (Array.isArray(result.corrections)) {
+      result.corrections = result.corrections.map((c: { original?: string; improved?: string; reason?: string }) => ({
+        original: c.original ? sanitizeText(c.original) : c.original,
+        improved: c.improved ? sanitizeText(c.improved) : c.improved,
+        reason: c.reason ? sanitizeText(c.reason) : c.reason,
+      }));
+    }
+
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
