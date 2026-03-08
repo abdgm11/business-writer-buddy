@@ -81,16 +81,27 @@ export const LandingNavbar = () => {
             className="overflow-hidden border-t bg-background md:hidden"
           >
             <div className="container flex flex-col gap-1 py-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) =>
+                link.isRoute ? (
+                  <Link
+                    key={link.href}
+                    to={link.href}
+                    onClick={() => setOpen(false)}
+                    className="rounded-lg px-4 py-3 text-sm font-medium text-gold hover:bg-muted transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
               <div className="mt-3 flex flex-col gap-2 px-4">
                 <Link to="/login" onClick={() => setOpen(false)}>
                   <Button variant="outline" className="w-full">Log in</Button>
