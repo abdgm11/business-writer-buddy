@@ -56,7 +56,7 @@ export function useRazorpay() {
       }
 
       const { data, error } = await supabase.functions.invoke("create-order", {
-        body: { currency, plan: "pro" },
+        body: { currency, plan },
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
