@@ -1,7 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useBadges } from "@/hooks/useBadges";
+import { useWeeklySummary } from "@/hooks/useWeeklySummary";
 import { BadgesSection } from "@/components/BadgesSection";
+import { WeeklySummaryCard } from "@/components/dashboard/WeeklySummaryCard";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import StreakCard from "@/components/dashboard/StreakCard";
 import StatsGrid from "@/components/dashboard/StatsGrid";
@@ -17,10 +19,11 @@ const Dashboard = () => {
   const {
     loading, error, retry, streak, streakGoal, stats,
     weeklyActivity, scoreTrend, contextBreakdown,
-    toneBreakdown, recentRewrites, badgeInput,
+    toneBreakdown, recentRewrites, allRewrites, badgeInput,
   } = useDashboardData();
 
   const badges = useBadges(badgeInput);
+  const weeklySummary = useWeeklySummary(allRewrites, streak);
 
   if (loading) {
     return <AppLayout><DashboardSkeleton /></AppLayout>;
@@ -50,6 +53,7 @@ const Dashboard = () => {
           <p className="text-muted-foreground mt-1">Track your writing progress and improvement over time.</p>
         </div>
 
+        <WeeklySummaryCard summary={weeklySummary} />
         <StreakCard streak={streak} streakGoal={streakGoal} />
         <StatsGrid stats={stats} />
         <BadgesSection badges={badges} variant="dashboard" />

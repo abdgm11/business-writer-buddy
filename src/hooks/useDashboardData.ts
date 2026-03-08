@@ -140,6 +140,7 @@ export function useDashboardData() {
     contextBreakdown,
     toneBreakdown,
     recentRewrites: allRewrites.slice(0, 10),
+    allRewrites,
     badgeInput,
   };
 }
