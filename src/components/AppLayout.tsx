@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Sparkles, LayoutDashboard, PenTool, BookOpen, Settings, LogOut, Award } from "lucide-react";
+import { Sparkles, LayoutDashboard, PenTool, BookOpen, Settings, LogOut, Award, HelpCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
@@ -8,6 +8,7 @@ const navItems = [
   { to: "/coach", label: "Coach", icon: PenTool },
   { to: "/lessons", label: "Lessons", icon: BookOpen },
   { to: "/report", label: "Report Card", icon: Award },
+  { to: "/support", label: "Help & Support", icon: HelpCircle },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 
