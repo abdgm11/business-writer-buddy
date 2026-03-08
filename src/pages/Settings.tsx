@@ -193,19 +193,34 @@ const Settings = () => {
               </div>
               <div className="rounded-lg border-2 border-gold p-4">
                 <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground">
-                        Pro Plan — {displayPrices[selectedCurrency] || displayPrices.INR}/month
-                      </p>
-                      <ul className="mt-2 space-y-1">
-                        {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
-                          <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Check className="h-3 w-3 text-gold" /> {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  <div>
+                    <p className="font-semibold text-foreground">
+                      Pro Plan — {displayPrice}{billingLabel}
+                    </p>
+                    {yearly && (
+                      <p className="text-xs text-gold font-medium mt-1">Save 30% with yearly billing</p>
+                    )}
+                    <ul className="mt-2 space-y-1">
+                      {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Check className="h-3 w-3 text-gold" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Billing toggle */}
+                  <div className="flex items-center gap-3">
+                    <span className={`text-sm font-medium ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
+                    <button
+                      onClick={() => setYearly(!yearly)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${yearly ? "bg-gold" : "bg-border"}`}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-card shadow transition-transform ${yearly ? "translate-x-6" : "translate-x-1"}`} />
+                    </button>
+                    <span className={`text-sm font-medium ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
+                      Yearly <span className="text-xs text-gold font-semibold">-30%</span>
+                    </span>
                   </div>
 
                   {/* Currency selector */}
