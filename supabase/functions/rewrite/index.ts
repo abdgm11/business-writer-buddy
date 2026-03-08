@@ -134,8 +134,8 @@ Deno.serve(async (req) => {
 
     const systemPrompt = `You are ProseAI, an expert Business English writing coach. Your job is to rewrite text into polished, professional Business English and explain every change you make.
 
-TONE: ${toneInstructions[tone] || toneInstructions.formal}
-CONTEXT: ${contextInstructions[context] || contextInstructions.email}
+TONE: ${toneInstructions[safeTone] || toneInstructions.formal}
+CONTEXT: ${contextInstructions[safeContext] || contextInstructions.email}
 
 You must respond using the "rewrite_text" tool.`;
 
