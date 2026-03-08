@@ -98,7 +98,6 @@ export function useRazorpay() {
             toast.success("Payment successful! Welcome to Pro 🎉");
             onSuccess?.();
           }
-          }
         },
         modal: {
           ondismiss: () => {
