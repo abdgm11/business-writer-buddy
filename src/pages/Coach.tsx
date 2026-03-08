@@ -234,10 +234,20 @@ const Coach = () => {
               <div className="rounded-xl border-2 border-success bg-card p-5">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-xs font-semibold uppercase tracking-wider text-success">Polished</p>
-                  <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 px-2 text-xs gap-1.5">
-                    {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
-                    {copied ? "Copied!" : "Copy"}
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 px-2 text-xs gap-1.5">
+                      {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+                      {copied ? "Copied!" : "Copy"}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleShareTwitter} className="h-7 px-2 text-xs gap-1.5">
+                      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                      Share
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleShareLinkedIn} className="h-7 px-2 text-xs gap-1.5">
+                      <Linkedin className="h-3.5 w-3.5" />
+                      Share
+                    </Button>
+                  </div>
                 </div>
                 <p className="text-sm text-foreground leading-relaxed">{result.polished}</p>
               </div>
