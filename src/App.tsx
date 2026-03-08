@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Coach from "./pages/Coach";
 import Lessons from "./pages/Lessons";
 import Settings from "./pages/Settings";
+import ReportCard from "./pages/ReportCard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
