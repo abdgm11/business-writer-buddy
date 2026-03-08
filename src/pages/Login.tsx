@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { gtagEvent } from "@/lib/gtag";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom";
-import { Sparkles, Mail, Lock, ArrowRight } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Sparkles, Mail, Lock, ArrowRight, Gift } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
@@ -16,6 +16,35 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get("ref");
+
+  // Auto-switch to signup mode if coming via referral link
+  useEffect(() => {
+    if (refCode) setIsSignup(true);
+  }, [refCode]);
+
+  // Process referral after successful signup + email confirmation
+  useEffect(() => {
+    if (user && refCode) {
+      const processReferral = async () => {
+        try {
+          const { data: sess } = await supabase.auth.getSession();
+          const { data, error } = await supabase.functions.invoke("process-referral", {
+            headers: { Authorization: `Bearer ${sess?.session?.access_token}` },
+            body: { referral_code: refCode },
+          });
+          if (!error && data?.success) {
+            toast.success(`🎉 ${data.message}`);
+            gtagEvent("referral_redeemed", { code: refCode });
+          }
+        } catch {
+          // silently fail — don't block login
+        }
+      };
+      processReferral();
+    }
+  }, [user, refCode]);
 
   if (user) return <Navigate to="/dashboard" replace />;
 
@@ -29,7 +58,7 @@ const Login = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: `${window.location.origin}/login${refCode ? `?ref=${refCode}` : ""}` },
         });
         if (error) throw error;
         gtagEvent("sign_up", { method: "email" });
@@ -49,7 +78,7 @@ const Login = () => {
 
   const handleGoogleAuth = async () => {
     const { error } = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}${refCode ? `/login?ref=${refCode}` : ""}`,
     });
     if (error) {
       toast.error("Google sign-in failed. Please try again.");
@@ -77,6 +106,16 @@ const Login = () => {
             {isSignup ? "Start writing like a professional today" : "Continue improving your writing"}
           </p>
         </div>
+
+        {/* Referral badge */}
+        {refCode && isSignup && (
+          <div className="mb-4 rounded-lg border border-gold/30 bg-gold/5 p-3 flex items-center gap-2 text-sm">
+            <Gift className="h-4 w-4 text-gold shrink-0" />
+            <span className="text-foreground">
+              You've been referred! Sign up to earn <span className="font-semibold text-gold">3 bonus rewrites</span>.
+            </span>
+          </div>
+        )}
 
         <div className="rounded-xl border bg-card p-6 shadow-elegant">
           <Button variant="outline" className="w-full mb-4" onClick={handleGoogleAuth}>
