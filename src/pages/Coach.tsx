@@ -42,8 +42,13 @@ const Coach = () => {
   const [result, setResult] = useState<RewriteResult | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const MAX_WORDS = 500;
+  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const isNearLimit = wordCount >= MAX_WORDS * 0.8;
+  const isOverLimit = wordCount > MAX_WORDS;
+
   const handleSubmit = async () => {
-    if (!text.trim()) return;
+    if (!text.trim() || isOverLimit) return;
     setLoading(true);
     setResult(null);
 
