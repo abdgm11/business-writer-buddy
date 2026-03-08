@@ -54,6 +54,19 @@ const Coach = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const shareText = result ? `${result.polished}\n\n✨ Polished with ProseAI — https://business-writer-buddy.lovable.app` : "";
+
+  const handleShareLinkedIn = () => {
+    gtagEvent("share_rewrite", { platform: "linkedin" });
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent("https://business-writer-buddy.lovable.app")}`, "_blank");
+  };
+
+  const handleShareTwitter = () => {
+    gtagEvent("share_rewrite", { platform: "twitter" });
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank");
+  };
+  };
+
   const MAX_WORDS = 500;
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
   const isNearLimit = wordCount >= MAX_WORDS * 0.8;
