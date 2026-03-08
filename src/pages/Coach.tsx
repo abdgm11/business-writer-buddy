@@ -3,7 +3,7 @@ import { gtagEvent } from "@/lib/gtag";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
-import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles, Zap, Copy, Check, Share2 } from "lucide-react";
+import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles, Zap, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
