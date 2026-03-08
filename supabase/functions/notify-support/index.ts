@@ -40,8 +40,6 @@ Deno.serve(async (req) => {
       throw new Error("Missing required fields");
     }
 
-    const userEmail = user.email || "unknown";
-
     // Send confirmation to user
     const userEmailPromise = fetch("https://api.resend.com/emails", {
       method: "POST",
