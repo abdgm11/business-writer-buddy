@@ -64,7 +64,11 @@ const Coach = () => {
       }
 
       if (data.error) {
-        toast.error(data.error);
+        if (data.limit_reached) {
+          toast.error(data.message || "Daily limit reached. Upgrade to Pro for unlimited rewrites.");
+        } else {
+          toast.error(data.error);
+        }
         return;
       }
 

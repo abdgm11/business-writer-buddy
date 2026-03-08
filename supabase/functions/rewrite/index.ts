@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -6,12 +6,44 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-serve(async (req) => {
+const FREE_DAILY_LIMIT = 3;
+
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    while (base64.length % 4) base64 += "=";
+    return JSON.parse(atob(base64));
+  } catch {
+    return null;
+  }
+}
+
+Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // --- Auth: extract user ID from JWT ---
+    const authHeader = req.headers.get("Authorization");
+    let userId: string | null = null;
+
+    if (authHeader?.startsWith("Bearer ")) {
+      const token = authHeader.replace("Bearer ", "");
+      const claims = decodeJwtPayload(token);
+      if (claims) {
+        const sub = claims.sub as string | undefined;
+        if (sub && claims.aud === "authenticated") {
+          const exp = claims.exp as number | undefined;
+          if (!exp || exp * 1000 > Date.now()) {
+            userId = sub;
+          }
+        }
+      }
+    }
+
     const { text, context, tone } = await req.json();
 
     if (!text || typeof text !== "string" || text.trim().length === 0) {
@@ -21,6 +53,52 @@ serve(async (req) => {
       });
     }
 
+    // --- Plan check: enforce daily limit for free users ---
+    if (userId) {
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+
+      // Check if user has an active pro payment
+      const { data: proPayments } = await adminClient
+        .from("payments")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("status", "paid")
+        .eq("plan", "pro")
+        .limit(1);
+
+      const isPro = (proPayments?.length ?? 0) > 0;
+
+      if (!isPro) {
+        // Count today's rewrites
+        const todayStart = new Date();
+        todayStart.setUTCHours(0, 0, 0, 0);
+
+        const { count } = await adminClient
+          .from("rewrites")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", userId)
+          .gte("created_at", todayStart.toISOString());
+
+        if ((count ?? 0) >= FREE_DAILY_LIMIT) {
+          return new Response(
+            JSON.stringify({
+              error: "Daily limit reached",
+              message: `Free plan allows ${FREE_DAILY_LIMIT} rewrites per day. Upgrade to Pro for unlimited rewrites.`,
+              limit_reached: true,
+            }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+      }
+    }
+
+    // --- AI rewrite ---
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
