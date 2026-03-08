@@ -6,18 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-function decodeJwtPayload(token: string): Record<string, unknown> | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length < 2) return null;
-    let base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-    while (base64.length % 4) base64 += "=";
-    return JSON.parse(atob(base64));
-  } catch {
-    return null;
-  }
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -32,17 +20,22 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Verify JWT with getClaims()
     const token = authHeader.replace("Bearer ", "");
-    const claims = decodeJwtPayload(token);
-    const userId = claims?.sub as string | undefined;
-    const exp = claims?.exp as number | undefined;
-
-    if (!userId || claims?.aud !== "authenticated" || (exp && exp * 1000 < Date.now())) {
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const userId = claimsData.claims.sub as string;
 
     const adminClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
@@ -50,7 +43,7 @@ Deno.serve(async (req) => {
     );
 
     // Set all "paid" pro payments to "cancelled"
-    const { error: updateError, count } = await adminClient
+    const { error: updateError } = await adminClient
       .from("payments")
       .update({ status: "cancelled", updated_at: new Date().toISOString() })
       .eq("user_id", userId)

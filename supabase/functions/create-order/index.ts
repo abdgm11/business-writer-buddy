@@ -12,7 +12,6 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log("create-order invoked, method:", req.method);
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -21,53 +20,23 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Decode JWT payload directly - the token has already been issued by our auth system
+    // Verify JWT with getClaims()
     const token = authHeader.replace("Bearer ", "");
-    const payloadBase64 = token.split(".")[1];
-    if (!payloadBase64) {
-      return new Response(JSON.stringify({ error: "Invalid token" }), {
+    const supabaseAuth = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
+    );
+    const { data: claimsData, error: claimsError } = await supabaseAuth.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    let claims: Record<string, unknown>;
-    try {
-      // Handle base64url padding
-      let base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
-      while (base64.length % 4) base64 += "=";
-      const decoded = atob(base64);
-      claims = JSON.parse(decoded);
-      console.log("JWT claims keys:", Object.keys(claims));
-      console.log("Has sub:", !!claims.sub, "Has user_id:", !!claims.user_id);
-    } catch (e) {
-      console.error("JWT decode error:", e);
-      return new Response(JSON.stringify({ error: "Invalid token format" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const userId = (claims.sub || claims.user_id) as string;
-    if (!userId) {
-      console.error("No user ID found in claims:", JSON.stringify(claims));
-      return new Response(JSON.stringify({ error: "Unauthorized - no user ID" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Check expiration
-    const exp = claims.exp as number | undefined;
-    if (exp && exp * 1000 < Date.now()) {
-      return new Response(JSON.stringify({ error: "Token expired" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    const userEmail = (claims.email || "") as string;
-    console.log("Authenticated user:", userId);
+    const userId = claimsData.claims.sub as string;
+    const userEmail = (claimsData.claims.email || "") as string;
 
     const { currency = "INR", plan = "pro" } = await req.json();
 
