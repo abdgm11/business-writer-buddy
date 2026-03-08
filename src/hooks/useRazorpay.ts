@@ -96,6 +96,8 @@ export function useRazorpay() {
             toast.error("Payment verification failed. Contact support.");
           } else {
             toast.success("Payment successful! Welcome to Pro 🎉");
+            onSuccess?.();
+          }
           }
         },
         modal: {

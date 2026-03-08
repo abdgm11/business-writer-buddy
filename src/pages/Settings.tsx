@@ -47,7 +47,7 @@ const Settings = () => {
 
   const handleUpgrade = () => {
     if (!user) return;
-    checkout(selectedCurrency, user.email || "", displayName || user.email || "");
+    checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan);
   };
 
   const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
