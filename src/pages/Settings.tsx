@@ -1,0 +1,63 @@
+import { AppLayout } from "@/components/AppLayout";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
+
+const Settings = () => {
+  return (
+    <AppLayout>
+      <div className="space-y-8 max-w-2xl">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground mt-1">Manage your account and subscription.</p>
+        </div>
+
+        {/* Profile */}
+        <div className="rounded-xl border bg-card p-6 shadow-elegant">
+          <h2 className="text-lg font-semibold text-foreground font-sans mb-4">Profile</h2>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-foreground">Name</label>
+              <input className="mt-1 w-full rounded-lg border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Your name" />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-foreground">Email</label>
+              <input className="mt-1 w-full rounded-lg border bg-background p-3 text-sm text-muted-foreground" value="user@example.com" disabled />
+            </div>
+            <Button variant="hero" size="sm">Save Changes</Button>
+          </div>
+        </div>
+
+        {/* Subscription */}
+        <div className="rounded-xl border bg-card p-6 shadow-elegant">
+          <h2 className="text-lg font-semibold text-foreground font-sans mb-4">Subscription</h2>
+          <div className="rounded-lg bg-muted p-4 mb-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-foreground">Free Plan</p>
+                <p className="text-sm text-muted-foreground">3 rewrites per day</p>
+              </div>
+              <span className="rounded-full bg-muted-foreground/10 px-3 py-1 text-xs font-medium text-muted-foreground">Current</span>
+            </div>
+          </div>
+          <div className="rounded-lg border-2 border-gold p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-foreground">Pro Plan — $12/month</p>
+                <ul className="mt-2 space-y-1">
+                  {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Check className="h-3 w-3 text-gold" /> {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Button variant="gold" size="sm">Upgrade</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AppLayout>
+  );
+};
+
+export default Settings;
