@@ -65,7 +65,6 @@ const Coach = () => {
     gtagEvent("share_rewrite", { platform: "twitter" });
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, "_blank");
   };
-  };
 
   const MAX_WORDS = 500;
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
