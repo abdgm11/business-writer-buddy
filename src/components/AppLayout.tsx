@@ -77,7 +77,9 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
             </div>
             <span className="font-bold text-foreground">ProseAI</span>
           </div>
-          <nav className="flex gap-1">
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <nav className="flex gap-1">
             {navItems.map((item) => {
               const active = location.pathname === item.to;
               return (
