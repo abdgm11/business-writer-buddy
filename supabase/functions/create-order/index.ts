@@ -105,7 +105,7 @@ serve(async (req) => {
     );
 
     await adminClient.from("payments").insert({
-      user_id: user.id,
+      user_id: userId,
       razorpay_order_id: order.id,
       amount,
       currency: normalizedCurrency,

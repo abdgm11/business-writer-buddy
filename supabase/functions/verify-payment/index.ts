@@ -88,7 +88,7 @@ serve(async (req) => {
         updated_at: new Date().toISOString(),
       })
       .eq("razorpay_order_id", razorpay_order_id)
-      .eq("user_id", user.id);
+      .eq("user_id", userId);
 
     if (updateError) {
       console.error("Payment update error:", updateError);
