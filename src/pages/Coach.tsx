@@ -72,6 +72,30 @@ const Coach = () => {
           ))}
         </div>
 
+        {/* Tone Selector */}
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">Tone</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {tones.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTone(t.id)}
+                className={`rounded-lg border px-4 py-2 text-sm font-medium transition-all ${
+                  tone === t.id
+                    ? "border-primary bg-primary/10 text-foreground"
+                    : "border-border bg-card text-muted-foreground hover:border-primary/50"
+                }`}
+                title={t.desc}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Input */}
         <div className="rounded-xl border bg-card p-6 shadow-elegant">
           <textarea
