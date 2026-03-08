@@ -34,6 +34,7 @@ const Coach = () => {
   const [text, setText] = useState("");
   const [context, setContext] = useState("email");
   const [tone, setTone] = useState("formal");
+  const [result, setResult] = useState<typeof mockResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
