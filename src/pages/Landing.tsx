@@ -284,17 +284,17 @@ const Landing = () => {
       </section>
 
       {/* Writing Tips */}
-      <section className="py-20 bg-muted/30">
-        <div className="container">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
-            <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold text-foreground md:text-4xl">
+      <section className="py-12 md:py-20 bg-muted/30">
+        <div className="container px-4 sm:px-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8 md:mb-12">
+            <motion.h2 variants={fadeUp} custom={0} className="text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">
               Business Writing Tips
             </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="mt-3 text-muted-foreground text-lg max-w-2xl mx-auto">
+            <motion.p variants={fadeUp} custom={1} className="mt-3 text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
               Quick tips to level up your professional English — no fluff, just what works.
             </motion.p>
           </motion.div>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
             {[
               { title: "How to Write a Professional Email", summary: "Start with a clear subject line, keep paragraphs short, and always end with a specific call to action. Avoid filler phrases like 'I hope this email finds you well.'", icon: Mail },
               { title: "Avoid These Common Grammar Mistakes", summary: "Confusing 'affect' vs 'effect,' misusing apostrophes, and dangling modifiers are the top errors non-native speakers make in business writing.", icon: BookOpen },
@@ -310,7 +310,7 @@ const Landing = () => {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="rounded-xl border bg-card p-6 shadow-elegant hover:shadow-lg transition-shadow"
+                className="rounded-xl border bg-card p-5 sm:p-6 shadow-elegant hover:shadow-lg transition-shadow"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted mb-4">
                   <tip.icon className="h-5 w-5 text-gold" />
