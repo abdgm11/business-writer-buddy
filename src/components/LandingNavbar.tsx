@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Sparkles, ArrowRight, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -50,6 +51,7 @@ export const LandingNavbar = () => {
         </div>
 
         <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle />
           <Link to="/login">
             <Button variant="ghost" size="sm">Log in</Button>
           </Link>
@@ -60,14 +62,17 @@ export const LandingNavbar = () => {
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="flex h-10 w-10 items-center justify-center rounded-lg border bg-card md:hidden"
-          aria-label="Toggle menu"
-        >
-          {open ? <X className="h-5 w-5 text-foreground" /> : <Menu className="h-5 w-5 text-foreground" />}
-        </button>
+        {/* Mobile controls */}
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
+          <button
+            onClick={() => setOpen(!open)}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border bg-card"
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="h-5 w-5 text-foreground" /> : <Menu className="h-5 w-5 text-foreground" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile slide-down menu */}
