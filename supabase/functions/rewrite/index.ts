@@ -12,9 +12,21 @@ const MAX_CHARS = 3000;
 const ALLOWED_CONTEXTS = ["email", "report", "presentation", "linkedin", "slack"];
 const ALLOWED_TONES = ["formal", "friendly", "assertive", "diplomatic"];
 
-// Simple in-memory rate limiter for anonymous users (per-IP)
-const anonRateLimiter = new Map<string, { count: number; resetAt: number }>();
-const ANON_WINDOW_MS = 60 * 60 * 1000; // 1 hour window
+const ANON_WINDOW_MS = 60 * 60 * 1000; // 1 hour window (in ms)
+const ANON_WINDOW_SEC = 3600; // 1 hour in seconds for KV expiry
+
+// Deno KV for distributed rate limiting across isolates
+const kv = await Deno.openKv();
+
+// Simple HTML/script tag stripper for AI output sanitization
+function sanitizeText(input: string): string {
+  return input
+    .replace(/<script[\s>][\s\S]*?<\/script>/gi, "")
+    .replace(/<\/?\w+[^>]*>/g, "")
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, "")
+    .replace(/javascript:/gi, "")
+    .trim();
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -100,36 +112,28 @@ Deno.serve(async (req) => {
         }
       }
     } else {
-      // Anonymous user: enforce per-IP rate limit
+      // Anonymous user: enforce per-IP rate limit using Deno KV (distributed)
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-      const now = Date.now();
-      const entry = anonRateLimiter.get(ip);
+      const kvKey = ["anon_rate", ip];
+      const entry = await kv.get<number>(kvKey);
+      const currentCount = entry.value ?? 0;
 
-      if (entry && now < entry.resetAt) {
-        if (entry.count >= ANON_DAILY_LIMIT) {
-          return new Response(
-            JSON.stringify({
-              error: "Rate limit reached",
-              message: "Anonymous usage is limited. Sign in for more rewrites.",
-              limit_reached: true,
-            }),
-            {
-              status: 429,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            }
-          );
-        }
-        entry.count++;
-      } else {
-        anonRateLimiter.set(ip, { count: 1, resetAt: now + ANON_WINDOW_MS });
+      if (currentCount >= ANON_DAILY_LIMIT) {
+        return new Response(
+          JSON.stringify({
+            error: "Rate limit reached",
+            message: "Anonymous usage is limited. Sign in for more rewrites.",
+            limit_reached: true,
+          }),
+          {
+            status: 429,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
       }
 
-      // Cleanup old entries periodically
-      if (anonRateLimiter.size > 10000) {
-        for (const [key, val] of anonRateLimiter) {
-          if (now >= val.resetAt) anonRateLimiter.delete(key);
-        }
-      }
+      // Increment counter with TTL-based expiry
+      await kv.set(kvKey, currentCount + 1, { expireIn: ANON_WINDOW_MS });
     }
 
     // --- AI rewrite ---
@@ -242,6 +246,18 @@ You must respond using the "rewrite_text" tool.`;
     }
 
     const result = JSON.parse(toolCall.function.arguments);
+
+    // Sanitize AI output to prevent stored XSS
+    if (result.polished) {
+      result.polished = sanitizeText(result.polished);
+    }
+    if (Array.isArray(result.corrections)) {
+      result.corrections = result.corrections.map((c: { original?: string; improved?: string; reason?: string }) => ({
+        original: c.original ? sanitizeText(c.original) : c.original,
+        improved: c.improved ? sanitizeText(c.improved) : c.improved,
+        reason: c.reason ? sanitizeText(c.reason) : c.reason,
+      }));
+    }
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
