@@ -56,6 +56,16 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (text.length > MAX_CHARS) {
+      return new Response(JSON.stringify({ error: "Text too long. Maximum 3000 characters allowed." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const safeContext = ALLOWED_CONTEXTS.includes(context) ? context : "email";
+    const safeTone = ALLOWED_TONES.includes(tone) ? tone : "formal";
+
     // --- Plan check: enforce daily limit for free users ---
     if (userId) {
       const adminClient = createClient(
