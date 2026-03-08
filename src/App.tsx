@@ -13,6 +13,7 @@ import Lessons from "./pages/Lessons";
 import Settings from "./pages/Settings";
 import ReportCard from "./pages/ReportCard";
 import Support from "./pages/Support";
+import EmailToneChecker from "./pages/EmailToneChecker";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/email-tone-checker" element={<EmailToneChecker />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/coach" element={<Coach />} />
             <Route path="/lessons" element={<ProtectedRoute><Lessons /></ProtectedRoute>} />
