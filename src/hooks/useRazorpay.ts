@@ -46,8 +46,20 @@ export function useRazorpay() {
         return;
       }
 
+      // Get the current session to ensure the auth token is sent
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+
+      if (!accessToken) {
+        toast.error("Please sign in again to continue.");
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("create-order", {
         body: { currency, plan: "pro" },
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       if (error || data?.error) {
