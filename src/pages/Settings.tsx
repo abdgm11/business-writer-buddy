@@ -26,6 +26,7 @@ const Settings = () => {
   const [saving, setSaving] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
   const [cancelling, setCancelling] = useState(false);
+  const [yearly, setYearly] = useState(false);
   const { checkout, loading: paymentLoading, SUPPORTED_CURRENCIES } = useRazorpay();
   const { isPro, loading: planLoading, refetch: refetchPlan } = useUserPlan();
 
@@ -59,7 +60,8 @@ const Settings = () => {
 
   const handleUpgrade = () => {
     if (!user) return;
-    checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan);
+    const plan = yearly ? "pro_yearly" : "pro_monthly";
+    checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan, plan);
   };
 
   const handleCancel = async () => {
@@ -85,11 +87,18 @@ const Settings = () => {
 
   const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
 
-  // Display price map
-  const displayPrices: Record<string, string> = {
-    INR: "₹999", USD: "$12", EUR: "€11", GBP: "£10",
+  const monthlyPrices: Record<string, string> = {
+    INR: "₹299", USD: "$12", EUR: "€11", GBP: "£10",
     AUD: "A$18", CAD: "C$16", SGD: "S$16", AED: "AED 45", JPY: "¥1800",
   };
+  const yearlyPrices: Record<string, string> = {
+    INR: "₹2,499", USD: "$99", EUR: "€92", GBP: "£84",
+    AUD: "A$151", CAD: "C$134", SGD: "S$134", AED: "AED 378", JPY: "¥15,100",
+  };
+  const displayPrice = yearly
+    ? (yearlyPrices[selectedCurrency] || yearlyPrices.INR)
+    : (monthlyPrices[selectedCurrency] || monthlyPrices.INR);
+  const billingLabel = yearly ? "/year" : "/month";
 
   return (
     <AppLayout>
@@ -184,19 +193,34 @@ const Settings = () => {
               </div>
               <div className="rounded-lg border-2 border-gold p-4">
                 <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-semibold text-foreground">
-                        Pro Plan — {displayPrices[selectedCurrency] || displayPrices.INR}/month
-                      </p>
-                      <ul className="mt-2 space-y-1">
-                        {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
-                          <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <Check className="h-3 w-3 text-gold" /> {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  <div>
+                    <p className="font-semibold text-foreground">
+                      Pro Plan — {displayPrice}{billingLabel}
+                    </p>
+                    {yearly && (
+                      <p className="text-xs text-gold font-medium mt-1">Save 30% with yearly billing</p>
+                    )}
+                    <ul className="mt-2 space-y-1">
+                      {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
+                        <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Check className="h-3 w-3 text-gold" /> {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Billing toggle */}
+                  <div className="flex items-center gap-3">
+                    <span className={`text-sm font-medium ${!yearly ? "text-foreground" : "text-muted-foreground"}`}>Monthly</span>
+                    <button
+                      onClick={() => setYearly(!yearly)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${yearly ? "bg-gold" : "bg-border"}`}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-card shadow transition-transform ${yearly ? "translate-x-6" : "translate-x-1"}`} />
+                    </button>
+                    <span className={`text-sm font-medium ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
+                      Yearly <span className="text-xs text-gold font-semibold">-30%</span>
+                    </span>
                   </div>
 
                   {/* Currency selector */}
