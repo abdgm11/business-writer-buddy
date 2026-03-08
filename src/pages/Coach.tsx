@@ -44,6 +44,15 @@ const Coach = () => {
   const [tone, setTone] = useState("formal");
   const [result, setResult] = useState<RewriteResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!result) return;
+    await navigator.clipboard.writeText(result.polished);
+    setCopied(true);
+    gtagEvent("copy_rewrite", { context, tone, word_count: wordCount });
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const MAX_WORDS = 500;
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
