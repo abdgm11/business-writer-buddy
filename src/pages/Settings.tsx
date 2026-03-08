@@ -8,6 +8,17 @@ import { toast } from "sonner";
 import { useRazorpay } from "@/hooks/useRazorpay";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { PaymentHistory } from "@/components/PaymentHistory";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Settings = () => {
   const { user } = useAuth();
