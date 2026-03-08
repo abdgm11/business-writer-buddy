@@ -24,6 +24,7 @@ const Dashboard = () => {
   } = useDashboardData();
 
   const badges = useBadges(badgeInput);
+  useBadgeNotifications(badges);
   const weeklySummary = useWeeklySummary(allRewrites, streak);
 
   if (loading) {
