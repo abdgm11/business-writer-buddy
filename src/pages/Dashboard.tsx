@@ -8,16 +8,34 @@ import ScoreTrendChart from "@/components/dashboard/ScoreTrendChart";
 import ContextBreakdownChart from "@/components/dashboard/ContextBreakdownChart";
 import ToneBreakdownChart from "@/components/dashboard/ToneBreakdownChart";
 import RecentHistory from "@/components/dashboard/RecentHistory";
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Dashboard = () => {
   const {
-    loading, streak, streakGoal, stats,
+    loading, error, retry, streak, streakGoal, stats,
     weeklyActivity, scoreTrend, contextBreakdown,
     toneBreakdown, recentRewrites,
   } = useDashboardData();
 
   if (loading) {
     return <AppLayout><DashboardSkeleton /></AppLayout>;
+  }
+
+  if (error) {
+    return (
+      <AppLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-center">
+          <AlertTriangle className="h-12 w-12 text-destructive" />
+          <h2 className="text-xl font-semibold text-foreground">Something went wrong</h2>
+          <p className="text-muted-foreground max-w-md">{error}</p>
+          <Button onClick={retry} variant="outline" className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Try again
+          </Button>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { RewriteRow } from "@/components/dashboard/types";
@@ -12,38 +12,53 @@ export function useDashboardData() {
   const [totalWords, setTotalWords] = useState(0);
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const [rewritesResult, profileResult] = await Promise.all([
+        supabase
+          .from("rewrites")
+          .select("id, original_text, context, tone, score, word_count, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("profiles")
+          .select("streak_count, last_practice_at")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+      ]);
+
+      if (rewritesResult.error) throw rewritesResult.error;
+      if (profileResult.error) throw profileResult.error;
+
+      const allData = rewritesResult.data ?? [];
+      setAllRewrites(allData);
+      setTotalWords(allData.reduce((sum, r) => sum + r.word_count, 0));
+
+      if (profileResult.data?.last_practice_at) {
+        const hoursSince = (Date.now() - new Date(profileResult.data.last_practice_at).getTime()) / (1000 * 60 * 60);
+        setStreak(hoursSince < 24 ? Math.max(profileResult.data.streak_count, 1) : 0);
+      }
+    } catch (err: any) {
+      console.error("Dashboard fetch error:", err);
+      setError(err?.message || "Failed to load dashboard data");
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
-    if (!user) return;
-
-    const fetchData = async () => {
-      const { data: allData } = await supabase
-        .from("rewrites")
-        .select("id, original_text, context, tone, score, word_count, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("streak_count, last_practice_at")
-        .eq("user_id", user.id)
-        .single();
-
-      if (allData) {
-        setAllRewrites(allData);
-        setTotalWords(allData.reduce((sum, r) => sum + r.word_count, 0));
-      }
-
-      if (profileData?.last_practice_at) {
-        const hoursSince = (Date.now() - new Date(profileData.last_practice_at).getTime()) / (1000 * 60 * 60);
-        setStreak(hoursSince < 24 ? Math.max(profileData.streak_count, 1) : 0);
-      }
-
-      setLoading(false);
-    };
-
     fetchData();
-  }, [user]);
+  }, [fetchData]);
 
   const weeklyActivity = useMemo(() => {
     const days: { day: string; rewrites: number; words: number }[] = [];
@@ -102,6 +117,8 @@ export function useDashboardData() {
 
   return {
     loading,
+    error,
+    retry: fetchData,
     streak,
     streakGoal: STREAK_GOAL,
     stats,
