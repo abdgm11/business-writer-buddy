@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      anon_rate_limits: {
+        Row: {
+          ip_hash: string
+          request_count: number
+          window_start: string
+        }
+        Insert: {
+          ip_hash: string
+          request_count?: number
+          window_start?: string
+        }
+        Update: {
+          ip_hash?: string
+          request_count?: number
+          window_start?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
