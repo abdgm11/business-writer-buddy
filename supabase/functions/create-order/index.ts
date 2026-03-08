@@ -31,18 +31,36 @@ Deno.serve(async (req) => {
       });
     }
 
-    let claims: { sub?: string; email?: string; exp?: number };
+    let claims: Record<string, unknown>;
     try {
-      claims = JSON.parse(atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/")));
-    } catch {
+      // Handle base64url padding
+      let base64 = payloadBase64.replace(/-/g, "+").replace(/_/g, "/");
+      while (base64.length % 4) base64 += "=";
+      const decoded = atob(base64);
+      claims = JSON.parse(decoded);
+      console.log("JWT claims keys:", Object.keys(claims));
+      console.log("Has sub:", !!claims.sub, "Has user_id:", !!claims.user_id);
+    } catch (e) {
+      console.error("JWT decode error:", e);
       return new Response(JSON.stringify({ error: "Invalid token format" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    if (!claims.sub || (claims.exp && claims.exp * 1000 < Date.now())) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+    const userId = (claims.sub || claims.user_id) as string;
+    if (!userId) {
+      console.error("No user ID found in claims:", JSON.stringify(claims));
+      return new Response(JSON.stringify({ error: "Unauthorized - no user ID" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Check expiration
+    const exp = claims.exp as number | undefined;
+    if (exp && exp * 1000 < Date.now()) {
+      return new Response(JSON.stringify({ error: "Token expired" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
