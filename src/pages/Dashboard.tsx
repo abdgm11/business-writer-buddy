@@ -1,22 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { Flame, FileText, BookOpen, TrendingUp, Zap } from "lucide-react";
+import { Flame, FileText, BookOpen, TrendingUp, Zap, Target, Calendar, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  LineChart, Line, PieChart, Pie, Cell,
+  AreaChart, Area,
+} from "recharts";
 
 interface RewriteRow {
   id: string;
   original_text: string;
   context: string;
+  tone: string;
   score: number | null;
   word_count: number;
   created_at: string;
 }
 
+const CHART_COLORS = [
+  "hsl(var(--gold))",
+  "hsl(var(--primary))",
+  "hsl(var(--accent))",
+  "hsl(var(--muted-foreground))",
+  "#6366f1",
+  "#ec4899",
+];
+
 const Dashboard = () => {
   const { user } = useAuth();
   const [rewrites, setRewrites] = useState<RewriteRow[]>([]);
+  const [allRewrites, setAllRewrites] = useState<RewriteRow[]>([]);
   const [totalWords, setTotalWords] = useState(0);
   const [streak, setStreak] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -25,12 +41,12 @@ const Dashboard = () => {
     if (!user) return;
 
     const fetchData = async () => {
-      const { data: rewriteData } = await supabase
+      // Fetch all rewrites for analytics
+      const { data: allData } = await supabase
         .from("rewrites")
-        .select("id, original_text, context, score, word_count, created_at")
+        .select("id, original_text, context, tone, score, word_count, created_at")
         .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(10);
+        .order("created_at", { ascending: false });
 
       const { data: profileData } = await supabase
         .from("profiles")
@@ -38,13 +54,13 @@ const Dashboard = () => {
         .eq("user_id", user.id)
         .single();
 
-      if (rewriteData) {
-        setRewrites(rewriteData);
-        setTotalWords(rewriteData.reduce((sum, r) => sum + r.word_count, 0));
+      if (allData) {
+        setAllRewrites(allData);
+        setRewrites(allData.slice(0, 10));
+        setTotalWords(allData.reduce((sum, r) => sum + r.word_count, 0));
       }
 
       if (profileData) {
-        // Calculate streak based on last_practice_at
         if (profileData.last_practice_at) {
           const lastPractice = new Date(profileData.last_practice_at);
           const now = new Date();
@@ -59,7 +75,80 @@ const Dashboard = () => {
     fetchData();
   }, [user]);
 
+  // Weekly activity data (last 7 days)
+  const weeklyActivity = useMemo(() => {
+    const days: { day: string; rewrites: number; words: number }[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dayStr = date.toLocaleDateString("en-US", { weekday: "short" });
+      const dateStr = date.toISOString().split("T")[0];
+      const dayRewrites = allRewrites.filter(
+        (r) => r.created_at.split("T")[0] === dateStr
+      );
+      days.push({
+        day: dayStr,
+        rewrites: dayRewrites.length,
+        words: dayRewrites.reduce((s, r) => s + r.word_count, 0),
+      });
+    }
+    return days;
+  }, [allRewrites]);
+
+  // Score trend (last 20 rewrites with scores, chronological)
+  const scoreTrend = useMemo(() => {
+    return allRewrites
+      .filter((r) => r.score !== null)
+      .slice(0, 20)
+      .reverse()
+      .map((r, i) => ({
+        index: i + 1,
+        score: r.score,
+        date: new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      }));
+  }, [allRewrites]);
+
+  // Context breakdown
+  const contextBreakdown = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allRewrites.forEach((r) => {
+      counts[r.context] = (counts[r.context] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [allRewrites]);
+
+  // Tone breakdown
+  const toneBreakdown = useMemo(() => {
+    const counts: Record<string, number> = {};
+    allRewrites.forEach((r) => {
+      counts[r.tone] = (counts[r.tone] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [allRewrites]);
+
   const streakGoal = 30;
+
+  const rewritesThisWeek = allRewrites.filter((r) => {
+    const d = new Date(r.created_at);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    return d > weekAgo;
+  }).length;
+
+  const avgScore = allRewrites.filter((r) => r.score).length > 0
+    ? Math.round(
+        allRewrites.filter((r) => r.score).reduce((s, r) => s + (r.score || 0), 0) /
+        allRewrites.filter((r) => r.score).length
+      )
+    : null;
+
+  const bestScore = allRewrites.filter((r) => r.score).length > 0
+    ? Math.max(...allRewrites.filter((r) => r.score).map((r) => r.score || 0))
+    : null;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -73,15 +162,27 @@ const Dashboard = () => {
   };
 
   const stats = [
-    { label: "Words Polished", value: totalWords.toLocaleString(), icon: FileText, change: `${rewrites.length} rewrites total` },
-    { label: "Rewrites This Week", value: rewrites.filter(r => {
-      const d = new Date(r.created_at);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return d > weekAgo;
-    }).length.toString(), icon: BookOpen, change: "Last 7 days" },
-    { label: "Avg Score", value: rewrites.length > 0 ? Math.round(rewrites.filter(r => r.score).reduce((s, r) => s + (r.score || 0), 0) / Math.max(1, rewrites.filter(r => r.score).length)).toString() : "—", icon: TrendingUp, change: rewrites.length > 0 ? "Based on your rewrites" : "Start writing!" },
+    { label: "Total Words Polished", value: totalWords.toLocaleString(), icon: FileText, change: `${allRewrites.length} rewrites total` },
+    { label: "This Week", value: rewritesThisWeek.toString(), icon: Calendar, change: "Last 7 days" },
+    { label: "Avg Score", value: avgScore ? avgScore.toString() : "—", icon: TrendingUp, change: avgScore ? "Across all rewrites" : "Start writing!" },
+    { label: "Best Score", value: bestScore ? bestScore.toString() : "—", icon: Target, change: bestScore ? "Your personal best!" : "No scores yet" },
   ];
+
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="rounded-lg border bg-card px-3 py-2 shadow-md">
+          <p className="text-xs font-medium text-foreground">{label}</p>
+          {payload.map((entry: any, i: number) => (
+            <p key={i} className="text-xs text-muted-foreground">
+              {entry.name}: <span className="font-semibold text-foreground">{entry.value}</span>
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <AppLayout>
@@ -136,9 +237,15 @@ const Dashboard = () => {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid gap-4 sm:grid-cols-3">
-          {stats.map((s) => (
-            <div key={s.label} className="rounded-xl border bg-card p-5 shadow-elegant">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((s, i) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.08 }}
+              className="rounded-xl border bg-card p-5 shadow-elegant"
+            >
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm text-muted-foreground">{s.label}</p>
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
@@ -147,8 +254,164 @@ const Dashboard = () => {
               </div>
               <p className="text-2xl font-bold text-foreground font-display">{s.value}</p>
               <p className="mt-1 text-xs text-muted-foreground">{s.change}</p>
-            </div>
+            </motion.div>
           ))}
+        </div>
+
+        {/* Charts Row */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Weekly Activity */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+            className="rounded-xl border bg-card p-5 shadow-elegant"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="h-4 w-4 text-gold" />
+              <h3 className="text-sm font-semibold text-foreground">Weekly Activity</h3>
+            </div>
+            {weeklyActivity.some((d) => d.rewrites > 0) ? (
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={weeklyActivity}>
+                  <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" allowDecimals={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="rewrites" name="Rewrites" fill="hsl(var(--gold))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[200px] text-sm text-muted-foreground">
+                No activity this week yet
+              </div>
+            )}
+          </motion.div>
+
+          {/* Score Trend */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="rounded-xl border bg-card p-5 shadow-elegant"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="h-4 w-4 text-gold" />
+              <h3 className="text-sm font-semibold text-foreground">Score Trend</h3>
+            </div>
+            {scoreTrend.length > 1 ? (
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={scoreTrend}>
+                  <defs>
+                    <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--gold))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--gold))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="hsl(var(--muted-foreground))" />
+                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} stroke="hsl(var(--muted-foreground))" />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area
+                    type="monotone"
+                    dataKey="score"
+                    name="Score"
+                    stroke="hsl(var(--gold))"
+                    strokeWidth={2}
+                    fill="url(#scoreGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-[200px] text-sm text-muted-foreground">
+                Need at least 2 scored rewrites
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Breakdowns Row */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Context Breakdown */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.35 }}
+            className="rounded-xl border bg-card p-5 shadow-elegant"
+          >
+            <h3 className="text-sm font-semibold text-foreground mb-4">Writing Context Breakdown</h3>
+            {contextBreakdown.length > 0 ? (
+              <div className="flex items-center gap-6">
+                <ResponsiveContainer width={140} height={140}>
+                  <PieChart>
+                    <Pie
+                      data={contextBreakdown}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={35}
+                      outerRadius={60}
+                      paddingAngle={3}
+                      dataKey="value"
+                    >
+                      {contextBreakdown.map((_, i) => (
+                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="flex-1 space-y-2">
+                  {contextBreakdown.map((item, i) => (
+                    <div key={item.name} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                        />
+                        <span className="text-muted-foreground capitalize">{item.name}</span>
+                      </div>
+                      <span className="font-medium text-foreground">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">No data yet</p>
+            )}
+          </motion.div>
+
+          {/* Tone Breakdown */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+            className="rounded-xl border bg-card p-5 shadow-elegant"
+          >
+            <h3 className="text-sm font-semibold text-foreground mb-4">Tone Usage</h3>
+            {toneBreakdown.length > 0 ? (
+              <div className="space-y-3">
+                {toneBreakdown.map((item, i) => {
+                  const max = toneBreakdown[0].value;
+                  return (
+                    <div key={item.name}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-muted-foreground capitalize">{item.name}</span>
+                        <span className="text-sm font-medium text-foreground">{item.value}</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-muted overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${(item.value / max) * 100}%` }}
+                          transition={{ duration: 0.6, delay: 0.5 + i * 0.1 }}
+                          className="h-full rounded-full"
+                          style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">No data yet</p>
+            )}
+          </motion.div>
         </div>
 
         {/* Recent History */}
@@ -169,9 +432,14 @@ const Dashboard = () => {
                       <p className="text-xs text-muted-foreground">{formatDate(h.created_at)}</p>
                     </div>
                     <div>
-                      <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground mb-1">
-                        {h.context}
-                      </span>
+                      <div className="flex gap-1.5 mb-1">
+                        <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                          {h.context}
+                        </span>
+                        <span className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground capitalize">
+                          {h.tone}
+                        </span>
+                      </div>
                       <p className="text-sm text-foreground">{h.original_text.substring(0, 80)}...</p>
                     </div>
                   </div>
