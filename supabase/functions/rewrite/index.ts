@@ -22,15 +22,13 @@ Deno.serve(async (req) => {
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
-      const token = authHeader.replace("Bearer ", "");
-      const supabaseAuth = createClient(
+      const adminClient = createClient(
         Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_ANON_KEY")!,
-        { global: { headers: { Authorization: authHeader } } }
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
       );
-      const { data, error } = await supabaseAuth.auth.getClaims(token);
-      if (!error && data?.claims?.sub) {
-        userId = data.claims.sub as string;
+      const { data: { user }, error } = await adminClient.auth.getUser(authHeader.replace("Bearer ", ""));
+      if (!error && user) {
+        userId = user.id;
       }
     }
 
