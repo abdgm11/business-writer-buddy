@@ -2,6 +2,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { useDashboardData } from "@/hooks/useDashboardData";
 import { useBadges } from "@/hooks/useBadges";
 import { useWeeklySummary } from "@/hooks/useWeeklySummary";
+import { useBadgeNotifications } from "@/hooks/useBadgeNotifications";
 import { BadgesSection } from "@/components/BadgesSection";
 import { WeeklySummaryCard } from "@/components/dashboard/WeeklySummaryCard";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
@@ -23,6 +24,7 @@ const Dashboard = () => {
   } = useDashboardData();
 
   const badges = useBadges(badgeInput);
+  useBadgeNotifications(badges);
   const weeklySummary = useWeeklySummary(allRewrites, streak);
 
   if (loading) {
