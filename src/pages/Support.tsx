@@ -124,17 +124,23 @@ const Support = () => {
       message: message.trim(),
     });
 
-    setSubmitting(false);
-
     if (error) {
+      setSubmitting(false);
       toast.error("Failed to submit ticket. Please try again.");
-    } else {
-      setSubmitted(true);
-      setSubject("");
-      setMessage("");
-      setCategory("");
-      toast.success("Support ticket submitted! We'll get back to you soon.");
+      return;
     }
+
+    // Send email notifications (non-blocking — ticket is already saved)
+    supabase.functions.invoke("notify-support", {
+      body: { category, subject: subject.trim(), message: message.trim() },
+    }).catch((err) => console.error("Email notification failed:", err));
+
+    setSubmitting(false);
+    setSubmitted(true);
+    setSubject("");
+    setMessage("");
+    setCategory("");
+    toast.success("Support ticket submitted! We'll get back to you soon.");
   };
 
   return (
