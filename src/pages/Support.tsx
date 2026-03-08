@@ -130,10 +130,19 @@ const Support = () => {
       return;
     }
 
-    // Send email notifications (non-blocking — ticket is already saved)
-    supabase.functions.invoke("notify-support", {
-      body: { category, subject: subject.trim(), message: message.trim() },
-    }).catch((err) => console.error("Email notification failed:", err));
+    // Send email notifications
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("notify-support", {
+        body: { category, subject: subject.trim(), message: message.trim() },
+      });
+      if (fnError) {
+        console.error("Email notification error:", fnError);
+      } else {
+        console.log("Email notification sent:", data);
+      }
+    } catch (err) {
+      console.error("Email notification failed:", err);
+    }
 
     setSubmitting(false);
     setSubmitted(true);
