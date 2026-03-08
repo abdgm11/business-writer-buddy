@@ -2,7 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
-import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare } from "lucide-react";
+import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2 } from "lucide-react";
+
+const tones = [
+  { id: "formal", label: "Formal", desc: "Board-level language" },
+  { id: "friendly", label: "Friendly-Professional", desc: "Warm but polished" },
+  { id: "assertive", label: "Assertive", desc: "Direct and confident" },
+  { id: "diplomatic", label: "Diplomatic", desc: "Tactful and careful" },
+] as const;
 
 const contexts = [
   { id: "email", label: "Email", icon: Mail },
