@@ -21,11 +21,12 @@ Deno.serve(async (req) => {
     }
 
     // Verify JWT with getUser() - cryptographic server-side verification
-    const adminClient = createClient(
+    const supabaseAuth = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } }
     );
-    const { data: { user }, error: userError } = await adminClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
     if (userError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -96,7 +97,11 @@ Deno.serve(async (req) => {
 
     const order = await razorpayRes.json();
 
-    // Save order to DB (reuse adminClient from auth verification above)
+    // Save order to DB
+    const adminClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
 
     await adminClient.from("payments").insert({
       user_id: userId,

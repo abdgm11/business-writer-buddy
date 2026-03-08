@@ -22,11 +22,12 @@ Deno.serve(async (req) => {
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
-      const adminClient = createClient(
+      const supabaseAuth = createClient(
         Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
       );
-      const { data: { user }, error } = await adminClient.auth.getUser(authHeader.replace("Bearer ", ""));
+      const { data: { user }, error } = await supabaseAuth.auth.getUser();
       if (!error && user) {
         userId = user.id;
       }
