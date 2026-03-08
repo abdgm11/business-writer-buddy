@@ -324,14 +324,14 @@ const Landing = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-20">
-        <div className="container max-w-3xl">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
-            <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold text-foreground md:text-4xl">
+      <section className="py-12 md:py-20">
+        <div className="container px-4 sm:px-6 max-w-3xl">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-8 md:mb-12">
+            <motion.h2 variants={fadeUp} custom={0} className="text-2xl font-bold text-foreground sm:text-3xl md:text-4xl">
               Frequently Asked Questions
             </motion.h2>
           </motion.div>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {[
               { q: "Is ProseAI free to use?", a: "Yes! You get 3 free rewrites per day. Upgrade to Pro for unlimited rewrites, all writing contexts, daily lessons, and full history." },
               { q: "What types of writing can ProseAI help with?", a: "ProseAI supports emails, reports, presentations, LinkedIn posts, and Slack messages. Choose your context and tone, and get tailored rewrites with grammar explanations." },
@@ -349,11 +349,11 @@ const Landing = () => {
                 custom={i}
                 className="group rounded-xl border bg-card shadow-elegant"
               >
-                <summary className="flex cursor-pointer items-center justify-between p-5 text-foreground font-medium hover:text-gold transition-colors">
-                  {faq.q}
-                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" />
+                <summary className="flex cursor-pointer items-center justify-between gap-3 p-4 sm:p-5 text-sm sm:text-base text-foreground font-medium hover:text-gold transition-colors [&::-webkit-details-marker]:hidden list-none">
+                  <span>{faq.q}</span>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-90" />
                 </summary>
-                <p className="px-5 pb-5 text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+                <p className="px-4 sm:px-5 pb-4 sm:pb-5 text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
               </motion.details>
             ))}
           </div>
