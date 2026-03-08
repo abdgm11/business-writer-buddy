@@ -95,6 +95,8 @@ const Coach = () => {
         await supabase.from("profiles").update({
           last_practice_at: new Date().toISOString(),
         }).eq("user_id", user.id);
+
+        refetchQuota();
       }
     } catch (e) {
       console.error("Rewrite error:", e);
