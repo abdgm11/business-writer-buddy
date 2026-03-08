@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { CorrectionItem } from "@/components/CorrectionItem";
 
 const sampleTexts: Record<string, string> = {
   before: "I want to ask about the project status. Can you give me update? We need to finish this by next week otherwise client will be angry. Please do the needful.",
