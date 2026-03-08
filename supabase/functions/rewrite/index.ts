@@ -57,14 +57,14 @@ Deno.serve(async (req) => {
     const safeContext = ALLOWED_CONTEXTS.includes(context) ? context : "email";
     const safeTone = ALLOWED_TONES.includes(tone) ? tone : "formal";
 
-    // --- Plan check: enforce daily limit for free users ---
+    // --- Rate limiting ---
     if (userId) {
+      // Authenticated user: enforce daily limit for free users
       const adminClient = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
       );
 
-      // Check if user has an active pro payment
       const { data: proPayments } = await adminClient
         .from("payments")
         .select("id")
@@ -76,7 +76,6 @@ Deno.serve(async (req) => {
       const isPro = (proPayments?.length ?? 0) > 0;
 
       if (!isPro) {
-        // Count today's rewrites
         const todayStart = new Date();
         todayStart.setUTCHours(0, 0, 0, 0);
 
@@ -98,6 +97,37 @@ Deno.serve(async (req) => {
               headers: { ...corsHeaders, "Content-Type": "application/json" },
             }
           );
+        }
+      }
+    } else {
+      // Anonymous user: enforce per-IP rate limit
+      const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+      const now = Date.now();
+      const entry = anonRateLimiter.get(ip);
+
+      if (entry && now < entry.resetAt) {
+        if (entry.count >= ANON_DAILY_LIMIT) {
+          return new Response(
+            JSON.stringify({
+              error: "Rate limit reached",
+              message: "Anonymous usage is limited. Sign in for more rewrites.",
+              limit_reached: true,
+            }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+        entry.count++;
+      } else {
+        anonRateLimiter.set(ip, { count: 1, resetAt: now + ANON_WINDOW_MS });
+      }
+
+      // Cleanup old entries periodically
+      if (anonRateLimiter.size > 10000) {
+        for (const [key, val] of anonRateLimiter) {
+          if (now >= val.resetAt) anonRateLimiter.delete(key);
         }
       }
     }
