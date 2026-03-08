@@ -32,6 +32,7 @@ const Login = () => {
           options: { emailRedirectTo: window.location.origin },
         });
         if (error) throw error;
+        gtagEvent("sign_up", { method: "email" });
         toast.success("Check your email to confirm your account!");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
