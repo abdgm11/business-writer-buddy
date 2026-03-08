@@ -22,21 +22,23 @@ Deno.serve(async (req) => {
 
     // Verify auth
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization header");
+    if (!authHeader?.startsWith("Bearer ")) throw new Error("Missing authorization header");
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) throw new Error("Unauthorized");
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: authError } = await supabase.auth.getClaims(token);
+    if (authError || !claimsData?.claims) throw new Error("Unauthorized");
+
+    const userEmail = claimsData.claims.email as string || "unknown";
+    const userId = claimsData.claims.sub as string;
 
     const { category, subject, message } = await req.json();
     if (!category || !subject || !message) {
       throw new Error("Missing required fields");
     }
-
-    const userEmail = user.email || "unknown";
 
     // Send confirmation to user
     const userEmailPromise = fetch("https://api.resend.com/emails", {
@@ -86,7 +88,7 @@ Deno.serve(async (req) => {
             <h2 style="color: #1a1f36; margin: 0 0 16px;">New Support Ticket</h2>
             <table style="width: 100%; border-collapse: collapse;">
               <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>From</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${userEmail}</td></tr>
-              <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>User ID</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${user.id}</td></tr>
+              <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>User ID</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${userId}</td></tr>
               <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>Category</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${category}</td></tr>
               <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>Subject</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${subject}</td></tr>
             </table>
