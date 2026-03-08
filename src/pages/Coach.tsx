@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
 import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const tones = [
   { id: "formal", label: "Formal", desc: "Board-level language" },
@@ -19,31 +21,52 @@ const contexts = [
   { id: "slack", label: "Slack", icon: MessageSquare },
 ] as const;
 
-const mockResult = {
-  original: "I want to inform you that the project is delayed because team members are not working properly. We need to fix this issue fast. Please let me know your thoughts on this matter.",
-  polished: "I would like to bring to your attention that the project timeline has been impacted due to resource allocation challenges within the team. We are taking immediate steps to address this matter and restore progress. I welcome your feedback and any guidance you may wish to offer.",
-  corrections: [
-    { original: "project is delayed", improved: "project timeline has been impacted", reason: "Softer framing avoids blame and sounds more professional" },
-    { original: "team members are not working properly", improved: "resource allocation challenges within the team", reason: "Diplomatic language — focuses on the systemic issue, not individuals" },
-    { original: "fix this issue fast", improved: "taking immediate steps to address this matter", reason: "Action-oriented language that shows accountability" },
-    { original: "let me know your thoughts", improved: "I welcome your feedback and any guidance you may wish to offer", reason: "More deferential tone appropriate for upward communication" },
-  ],
-};
+interface Correction {
+  original: string;
+  improved: string;
+  reason: string;
+}
+
+interface RewriteResult {
+  polished: string;
+  corrections: Correction[];
+}
 
 const Coach = () => {
   const [text, setText] = useState("");
   const [context, setContext] = useState("email");
   const [tone, setTone] = useState("formal");
-  const [result, setResult] = useState<typeof mockResult | null>(null);
+  const [result, setResult] = useState<RewriteResult | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
     setLoading(true);
-    // Mock AI response for now
-    await new Promise((r) => setTimeout(r, 1500));
-    setResult(mockResult);
-    setLoading(false);
+    setResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("rewrite", {
+        body: { text: text.trim(), context, tone },
+      });
+
+      if (error) {
+        console.error("Edge function error:", error);
+        toast.error("Failed to rewrite text. Please try again.");
+        return;
+      }
+
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setResult({ polished: data.polished, corrections: data.corrections });
+    } catch (e) {
+      console.error("Rewrite error:", e);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -116,7 +139,7 @@ const Coach = () => {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-xl border bg-card p-5">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-destructive">Original</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{result.original}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
               </div>
               <div className="rounded-xl border-2 border-success bg-card p-5">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-success">Polished</p>
