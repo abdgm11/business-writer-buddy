@@ -80,11 +80,15 @@ export function useRazorpay() {
         },
         theme: { color: "#D4A847" },
         handler: async (response: any) => {
+          const { data: sess } = await supabase.auth.getSession();
           const { error: verifyError } = await supabase.functions.invoke("verify-payment", {
             body: {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
+            },
+            headers: {
+              Authorization: `Bearer ${sess?.session?.access_token}`,
             },
           });
 
