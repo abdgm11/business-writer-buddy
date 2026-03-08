@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useRazorpay } from "@/hooks/useRazorpay";
+import { PaymentHistory } from "@/components/PaymentHistory";
 
 const Settings = () => {
   const { user } = useAuth();
@@ -145,8 +146,11 @@ const Settings = () => {
                 {paymentLoading ? "Processing..." : "Upgrade Now"}
               </Button>
             </div>
-          </div>
         </div>
+
+        {/* Payment History */}
+        <PaymentHistory />
+      </div>
       </div>
     </AppLayout>
   );
