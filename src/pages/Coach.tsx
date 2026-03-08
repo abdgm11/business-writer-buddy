@@ -159,22 +159,28 @@ const Coach = () => {
 
         {/* Input */}
         <div className="rounded-xl border bg-card p-6 shadow-elegant">
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Paste your email, report, message, or speech draft here..."
-            className="mb-4 w-full resize-none rounded-lg border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[150px]"
-            rows={6}
-          />
-          <div className="flex items-center justify-between">
-            <Button variant="hero" onClick={handleSubmit} disabled={!text.trim() || loading}>
-              {loading ? "Polishing..." : "Polish My Writing"} <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <p className="text-xs text-muted-foreground">
-              {text.trim() ? `${text.trim().split(/\s+/).length} words · ${text.length} characters` : "0 words · 0 characters"}
-            </p>
-          </div>
-        </div>
+           <textarea
+             value={text}
+             onChange={(e) => setText(e.target.value)}
+             placeholder="Paste your email, report, message, or speech draft here..."
+             className={`mb-2 w-full resize-none rounded-lg border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[150px] ${isOverLimit ? "border-destructive focus:ring-destructive" : ""}`}
+             rows={6}
+           />
+           {isOverLimit && (
+             <p className="text-xs text-destructive mb-2">Text exceeds the {MAX_WORDS}-word limit. Please shorten it before submitting.</p>
+           )}
+           {isNearLimit && !isOverLimit && (
+             <p className="text-xs text-gold mb-2">Approaching the {MAX_WORDS}-word limit ({MAX_WORDS - wordCount} words remaining).</p>
+           )}
+           <div className="flex items-center justify-between">
+             <Button variant="hero" onClick={handleSubmit} disabled={!text.trim() || loading || isOverLimit}>
+               {loading ? "Polishing..." : "Polish My Writing"} <ArrowRight className="ml-2 h-4 w-4" />
+             </Button>
+             <p className={`text-xs ${isOverLimit ? "text-destructive font-medium" : isNearLimit ? "text-gold" : "text-muted-foreground"}`}>
+               {wordCount}/{MAX_WORDS} words · {text.length} characters
+             </p>
+           </div>
+         </div>
 
         {/* Results */}
         {result && (
