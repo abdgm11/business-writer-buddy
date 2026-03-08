@@ -94,6 +94,23 @@ const Landing = () => {
             <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
               <HeroDemoInput />
             </motion.div>
+            <motion.div
+              custom={4}
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              className="mt-10 inline-flex items-center gap-6 rounded-full border bg-card px-6 py-3 text-sm text-muted-foreground"
+            >
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-gold" />
+                <span className="font-semibold text-foreground">{totalRewrites.toLocaleString()}</span> texts polished
+              </div>
+              <div className="h-4 w-px bg-border" />
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-gold" />
+                80+ countries
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
