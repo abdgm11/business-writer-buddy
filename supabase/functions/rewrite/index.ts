@@ -12,11 +12,7 @@ const MAX_CHARS = 3000;
 const ALLOWED_CONTEXTS = ["email", "report", "presentation", "linkedin", "slack"];
 const ALLOWED_TONES = ["formal", "friendly", "assertive", "diplomatic"];
 
-const ANON_WINDOW_MS = 60 * 60 * 1000; // 1 hour window (in ms)
-const ANON_WINDOW_SEC = 3600; // 1 hour in seconds for KV expiry
-
-// Deno KV for distributed rate limiting across isolates
-const kv = await Deno.openKv();
+const ANON_WINDOW_MINUTES = 60; // 1 hour window
 
 // Simple HTML/script tag stripper for AI output sanitization
 function sanitizeText(input: string): string {
