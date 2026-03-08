@@ -12,11 +12,7 @@ const MAX_CHARS = 3000;
 const ALLOWED_CONTEXTS = ["email", "report", "presentation", "linkedin", "slack"];
 const ALLOWED_TONES = ["formal", "friendly", "assertive", "diplomatic"];
 
-const ANON_WINDOW_MS = 60 * 60 * 1000; // 1 hour window (in ms)
-const ANON_WINDOW_SEC = 3600; // 1 hour in seconds for KV expiry
-
-// Deno KV for distributed rate limiting across isolates
-const kv = await Deno.openKv();
+const ANON_WINDOW_MINUTES = 60; // 1 hour window
 
 // Simple HTML/script tag stripper for AI output sanitization
 function sanitizeText(input: string): string {
@@ -112,28 +108,53 @@ Deno.serve(async (req) => {
         }
       }
     } else {
-      // Anonymous user: enforce per-IP rate limit using Deno KV (distributed)
+      // Anonymous user: enforce per-IP rate limit using database (distributed)
       const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-      const kvKey = ["anon_rate", ip];
-      const entry = await kv.get<number>(kvKey);
-      const currentCount = entry.value ?? 0;
+      // Hash IP for privacy
+      const encoder = new TextEncoder();
+      const hashBuffer = await crypto.subtle.digest("SHA-256", encoder.encode(ip));
+      const ipHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
 
-      if (currentCount >= ANON_DAILY_LIMIT) {
-        return new Response(
-          JSON.stringify({
-            error: "Rate limit reached",
-            message: "Anonymous usage is limited. Sign in for more rewrites.",
-            limit_reached: true,
-          }),
-          {
-            status: 429,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+
+      const windowStart = new Date(Date.now() - ANON_WINDOW_MINUTES * 60 * 1000).toISOString();
+
+      // Check existing rate limit entry
+      const { data: entry } = await adminClient
+        .from("anon_rate_limits")
+        .select("request_count, window_start")
+        .eq("ip_hash", ipHash)
+        .single();
+
+      if (entry && new Date(entry.window_start).toISOString() > windowStart) {
+        // Within window
+        if (entry.request_count >= ANON_DAILY_LIMIT) {
+          return new Response(
+            JSON.stringify({
+              error: "Rate limit reached",
+              message: "Anonymous usage is limited. Sign in for more rewrites.",
+              limit_reached: true,
+            }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+        // Increment
+        await adminClient
+          .from("anon_rate_limits")
+          .update({ request_count: entry.request_count + 1 })
+          .eq("ip_hash", ipHash);
+      } else {
+        // New window or expired - upsert with fresh count
+        await adminClient
+          .from("anon_rate_limits")
+          .upsert({ ip_hash: ipHash, request_count: 1, window_start: new Date().toISOString() }, { onConflict: "ip_hash" });
       }
-
-      // Increment counter with TTL-based expiry
-      await kv.set(kvKey, currentCount + 1, { expireIn: ANON_WINDOW_MS });
     }
 
     // --- AI rewrite ---
