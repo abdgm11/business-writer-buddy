@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
+import { CorrectionItem } from "@/components/CorrectionItem";
 import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare } from "lucide-react";
 
 const contexts = [
@@ -92,18 +93,12 @@ const Coach = () => {
             </div>
             <div className="rounded-xl border bg-card p-5">
               <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-gold">Corrections & Explanations</p>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {result.corrections.map((c) => (
-                  <div key={c.original} className="flex flex-col gap-1 rounded-lg bg-muted p-3">
-                    <p className="text-sm">
-                      <span className="line-through text-destructive/70">{c.original}</span>
-                      {" → "}
-                      <span className="font-medium text-success">{c.improved}</span>
-                    </p>
-                    <p className="text-xs text-muted-foreground italic">{c.reason}</p>
-                  </div>
+                  <CorrectionItem key={c.original} {...c} />
                 ))}
               </div>
+              <p className="text-xs text-muted-foreground mt-3">Click each correction to see the grammar rule</p>
             </div>
           </div>
         )}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { CorrectionItem } from "@/components/CorrectionItem";
 
 const sampleTexts: Record<string, string> = {
   before: "I want to ask about the project status. Can you give me update? We need to finish this by next week otherwise client will be angry. Please do the needful.",
@@ -55,18 +56,12 @@ export const HeroDemoInput = () => {
           </div>
           <div className="rounded-xl border bg-card p-5">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-gold">What Changed & Why</p>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {corrections.map((c) => (
-                <div key={c.original} className="flex flex-col gap-1 rounded-lg bg-muted p-3">
-                  <p className="text-sm">
-                    <span className="line-through text-destructive/70">{c.original}</span>
-                    {" → "}
-                    <span className="font-medium text-success">{c.improved}</span>
-                  </p>
-                  <p className="text-xs text-muted-foreground italic">{c.reason}</p>
-                </div>
+                <CorrectionItem key={c.original} {...c} />
               ))}
             </div>
+            <p className="text-xs text-muted-foreground mt-2">Click each correction to see the grammar rule</p>
           </div>
           <Button variant="gold" onClick={() => setShowResult(false)}>
             Try Another
