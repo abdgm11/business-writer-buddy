@@ -88,7 +88,7 @@ Deno.serve(async (req) => {
             <h2 style="color: #1a1f36; margin: 0 0 16px;">New Support Ticket</h2>
             <table style="width: 100%; border-collapse: collapse;">
               <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>From</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${userEmail}</td></tr>
-              <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>User ID</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${user.id}</td></tr>
+              <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>User ID</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${userId}</td></tr>
               <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>Category</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${category}</td></tr>
               <tr><td style="padding: 8px; color: #6b7280; font-size: 13px; border-bottom: 1px solid #e5e7eb;"><strong>Subject</strong></td><td style="padding: 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb;">${subject}</td></tr>
             </table>
