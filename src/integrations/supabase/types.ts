@@ -77,33 +77,72 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bonus_rewrites: number
           created_at: string
           display_name: string | null
           id: string
           last_practice_at: string | null
+          referral_code: string | null
           streak_count: number
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          bonus_rewrites?: number
           created_at?: string
           display_name?: string | null
           id?: string
           last_practice_at?: string | null
+          referral_code?: string | null
           streak_count?: number
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          bonus_rewrites?: number
           created_at?: string
           display_name?: string | null
           id?: string
           last_practice_at?: string | null
+          referral_code?: string | null
           streak_count?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          referred_id: string
+          referred_reward: number
+          referrer_id: string
+          referrer_reward: number
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referred_id: string
+          referred_reward?: number
+          referrer_id: string
+          referrer_reward?: number
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referred_id?: string
+          referred_reward?: number
+          referrer_id?: string
+          referrer_reward?: number
+          status?: string
         }
         Relationships: []
       }
