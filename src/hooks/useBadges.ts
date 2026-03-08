@@ -66,7 +66,7 @@ export function useBadges(input: BadgeInput): Badge[] {
       ...def,
       unlocked: check(input),
     }));
-  }, [input]);
+  }, [input.totalRewrites, input.totalWords, input.streak, input.bestScore, input.avgScore, input.uniqueContexts, input.daysPracticed]);
 }
 
 export const TIER_COLORS: Record<Badge["tier"], { bg: string; border: string; text: string }> = {

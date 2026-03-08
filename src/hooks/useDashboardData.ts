@@ -116,9 +116,9 @@ export function useDashboardData() {
   ];
 
   const uniqueContexts = contextBreakdown.length;
-  const uniqueDays = new Set(allRewrites.map((r) => r.created_at.split("T")[0]));
+  const uniqueDays = useMemo(() => new Set(allRewrites.map((r) => r.created_at.split("T")[0])), [allRewrites]);
 
-  const badgeInput = {
+  const badgeInput = useMemo(() => ({
     totalRewrites: allRewrites.length,
     totalWords: totalWords,
     streak,
@@ -126,7 +126,7 @@ export function useDashboardData() {
     avgScore: avgScore ?? null,
     uniqueContexts,
     daysPracticed: uniqueDays.size,
-  };
+  }), [allRewrites.length, totalWords, streak, bestScore, avgScore, uniqueContexts, uniqueDays.size]);
 
   return {
     loading,
