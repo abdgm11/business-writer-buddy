@@ -62,6 +62,27 @@ const Settings = () => {
     checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan);
   };
 
+  const handleCancel = async () => {
+    if (!user) return;
+    setCancelling(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const { error } = await supabase.functions.invoke("cancel-subscription", {
+        headers: { Authorization: `Bearer ${sess?.session?.access_token}` },
+      });
+      if (error) {
+        toast.error("Failed to cancel subscription. Please try again.");
+      } else {
+        toast.success("Subscription cancelled. You're now on the Free plan.");
+        refetchPlan();
+      }
+    } catch {
+      toast.error("Something went wrong.");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
 
   // Display price map
