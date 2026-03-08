@@ -42,38 +42,15 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md">
-        <div className="container flex h-16 items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-navy">
-              <Sparkles className="h-4 w-4 text-gold" />
-            </div>
-            <span className="text-xl font-bold text-foreground">
-              Prose<span className="text-gold">AI</span>
-            </span>
-          </Link>
-          <div className="hidden items-center gap-8 md:flex">
-            <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Features</a>
-            <a href="#pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-            <a href="#testimonials" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Testimonials</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm">Log in</Button>
-            </Link>
-            <Link to="/login">
-              <Button variant="hero" size="sm">
-                Get Started Free <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <LandingNavbar />
 
       {/* Hero */}
       <section className="relative overflow-hidden py-20 md:py-32">
+        {/* Background effects */}
         <div className="absolute inset-0 gradient-navy opacity-[0.03]" />
+        <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-gold/5 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full bg-navy/10 blur-3xl" />
+
         <div className="container relative">
           <div className="mx-auto max-w-4xl text-center">
             <motion.div
@@ -81,7 +58,7 @@ const Landing = () => {
               variants={fadeUp}
               initial="hidden"
               animate="visible"
-              className="mb-4 inline-flex items-center gap-2 rounded-full border bg-card px-4 py-1.5 text-sm text-muted-foreground"
+              className="mb-6 inline-flex items-center gap-2 rounded-full border bg-card px-4 py-1.5 text-sm text-muted-foreground shadow-elegant"
             >
               <Globe className="h-3.5 w-3.5 text-gold" />
               Trusted by professionals in 80+ countries
@@ -91,7 +68,7 @@ const Landing = () => {
               variants={fadeUp}
               initial="hidden"
               animate="visible"
-              className="mb-6 text-4xl font-bold tracking-tight text-foreground md:text-6xl lg:text-7xl"
+              className="mb-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl !leading-[1.1]"
             >
               Sound Like a Native
               <br />
@@ -102,10 +79,10 @@ const Landing = () => {
               variants={fadeUp}
               initial="hidden"
               animate="visible"
-              className="mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl"
+              className="mx-auto mb-10 max-w-2xl text-base text-muted-foreground sm:text-lg md:text-xl leading-relaxed"
             >
               Paste any email, report, or message — get it instantly rewritten in polished Business English
-              with color-coded explanations of every improvement. Learn as you write.
+              with color-coded explanations of every improvement. <span className="font-medium text-foreground">Learn as you write.</span>
             </motion.p>
             <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
               <HeroDemoInput />
@@ -115,13 +92,13 @@ const Landing = () => {
               variants={fadeUp}
               initial="hidden"
               animate="visible"
-              className="mt-10 inline-flex items-center gap-6 rounded-full border bg-card px-6 py-3 text-sm text-muted-foreground"
+              className="mt-10 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 rounded-full border bg-card px-6 py-3 text-sm text-muted-foreground shadow-elegant"
             >
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-gold" />
                 <span className="font-semibold text-foreground">{totalRewrites.toLocaleString()}</span> texts polished
               </div>
-              <div className="h-4 w-px bg-border" />
+              <div className="hidden sm:block h-4 w-px bg-border" />
               <div className="flex items-center gap-2">
                 <Globe className="h-4 w-4 text-gold" />
                 80+ countries
