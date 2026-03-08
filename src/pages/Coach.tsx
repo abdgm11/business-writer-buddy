@@ -3,7 +3,7 @@ import { gtagEvent } from "@/lib/gtag";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
-import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2, Sparkles, Zap, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -44,6 +44,15 @@ const Coach = () => {
   const [tone, setTone] = useState("formal");
   const [result, setResult] = useState<RewriteResult | null>(null);
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!result) return;
+    await navigator.clipboard.writeText(result.polished);
+    setCopied(true);
+    gtagEvent("copy_rewrite", { context, tone, word_count: wordCount });
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const MAX_WORDS = 500;
   const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
@@ -210,7 +219,13 @@ const Coach = () => {
                 <p className="text-sm text-muted-foreground leading-relaxed">{text}</p>
               </div>
               <div className="rounded-xl border-2 border-success bg-card p-5">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-success">Polished</p>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-success">Polished</p>
+                  <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 px-2 text-xs gap-1.5">
+                    {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
                 <p className="text-sm text-foreground leading-relaxed">{result.polished}</p>
               </div>
             </div>
