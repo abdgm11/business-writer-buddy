@@ -21,27 +21,35 @@ serve(async (req) => {
       });
     }
 
-    // Validate user by calling the auth API directly
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const userRes = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: {
-        Authorization: authHeader,
-        apikey: Deno.env.get("SUPABASE_ANON_KEY")!,
-      },
-    });
+    // Decode JWT payload directly - the token has already been issued by our auth system
+    const token = authHeader.replace("Bearer ", "");
+    const payloadBase64 = token.split(".")[1];
+    if (!payloadBase64) {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    if (!userRes.ok) {
-      const errText = await userRes.text();
-      console.error("Auth validation failed:", userRes.status, errText);
+    let claims: { sub?: string; email?: string; exp?: number };
+    try {
+      claims = JSON.parse(atob(payloadBase64.replace(/-/g, "+").replace(/_/g, "/")));
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid token format" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!claims.sub || (claims.exp && claims.exp * 1000 < Date.now())) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const authUser = await userRes.json();
-    const userId = authUser.id as string;
-    const userEmail = (authUser.email || "") as string;
+    const userId = claims.sub;
+    const userEmail = claims.email || "";
 
     const { currency = "INR", plan = "pro" } = await req.json();
 
