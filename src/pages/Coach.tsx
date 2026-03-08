@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { CorrectionItem } from "@/components/CorrectionItem";
 import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare, Volume2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const tones = [
@@ -33,6 +34,7 @@ interface RewriteResult {
 }
 
 const Coach = () => {
+  const { user } = useAuth();
   const [text, setText] = useState("");
   const [context, setContext] = useState("email");
   const [tone, setTone] = useState("formal");
@@ -60,7 +62,28 @@ const Coach = () => {
         return;
       }
 
-      setResult({ polished: data.polished, corrections: data.corrections });
+      const rewriteResult: RewriteResult = { polished: data.polished, corrections: data.corrections };
+      setResult(rewriteResult);
+
+      // Save to history
+      if (user) {
+        const wordCount = text.trim().split(/\s+/).length;
+        await supabase.from("rewrites").insert({
+          user_id: user.id,
+          original_text: text.trim(),
+          polished_text: data.polished,
+          corrections: data.corrections,
+          context,
+          tone,
+          word_count: wordCount,
+          score: Math.min(100, 70 + data.corrections.length * 5),
+        });
+
+        // Update streak
+        await supabase.from("profiles").update({
+          last_practice_at: new Date().toISOString(),
+        }).eq("user_id", user.id);
+      }
     } catch (e) {
       console.error("Rewrite error:", e);
       toast.error("Something went wrong. Please try again.");
@@ -128,9 +151,14 @@ const Coach = () => {
             className="mb-4 w-full resize-none rounded-lg border bg-background p-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring min-h-[150px]"
             rows={6}
           />
-          <Button variant="hero" onClick={handleSubmit} disabled={!text.trim() || loading}>
-            {loading ? "Polishing..." : "Polish My Writing"} <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="flex items-center justify-between">
+            <Button variant="hero" onClick={handleSubmit} disabled={!text.trim() || loading}>
+              {loading ? "Polishing..." : "Polish My Writing"} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              {text.trim() ? `${text.trim().split(/\s+/).length} words` : ""}
+            </p>
+          </div>
         </div>
 
         {/* Results */}
