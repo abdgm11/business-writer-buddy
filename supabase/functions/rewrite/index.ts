@@ -7,6 +7,9 @@ const corsHeaders = {
 };
 
 const FREE_DAILY_LIMIT = 3;
+const MAX_CHARS = 3000;
+const ALLOWED_CONTEXTS = ["email", "report", "presentation", "linkedin", "slack"];
+const ALLOWED_TONES = ["formal", "friendly", "assertive", "diplomatic"];
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
@@ -52,6 +55,16 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    if (text.length > MAX_CHARS) {
+      return new Response(JSON.stringify({ error: "Text too long. Maximum 3000 characters allowed." }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const safeContext = ALLOWED_CONTEXTS.includes(context) ? context : "email";
+    const safeTone = ALLOWED_TONES.includes(tone) ? tone : "formal";
 
     // --- Plan check: enforce daily limit for free users ---
     if (userId) {
@@ -121,8 +134,8 @@ Deno.serve(async (req) => {
 
     const systemPrompt = `You are ProseAI, an expert Business English writing coach. Your job is to rewrite text into polished, professional Business English and explain every change you make.
 
-TONE: ${toneInstructions[tone] || toneInstructions.formal}
-CONTEXT: ${contextInstructions[context] || contextInstructions.email}
+TONE: ${toneInstructions[safeTone] || toneInstructions.formal}
+CONTEXT: ${contextInstructions[safeContext] || contextInstructions.email}
 
 You must respond using the "rewrite_text" tool.`;
 
@@ -215,7 +228,7 @@ You must respond using the "rewrite_text" tool.`;
   } catch (e) {
     console.error("rewrite error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
