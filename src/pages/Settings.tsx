@@ -87,11 +87,18 @@ const Settings = () => {
 
   const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
 
-  // Display price map
-  const displayPrices: Record<string, string> = {
-    INR: "₹999", USD: "$12", EUR: "€11", GBP: "£10",
+  const monthlyPrices: Record<string, string> = {
+    INR: "₹299", USD: "$12", EUR: "€11", GBP: "£10",
     AUD: "A$18", CAD: "C$16", SGD: "S$16", AED: "AED 45", JPY: "¥1800",
   };
+  const yearlyPrices: Record<string, string> = {
+    INR: "₹2,499", USD: "$99", EUR: "€92", GBP: "£84",
+    AUD: "A$151", CAD: "C$134", SGD: "S$134", AED: "AED 378", JPY: "¥15,100",
+  };
+  const displayPrice = yearly
+    ? (yearlyPrices[selectedCurrency] || yearlyPrices.INR)
+    : (monthlyPrices[selectedCurrency] || monthlyPrices.INR);
+  const billingLabel = yearly ? "/year" : "/month";
 
   return (
     <AppLayout>
