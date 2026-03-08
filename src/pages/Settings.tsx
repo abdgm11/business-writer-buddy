@@ -5,11 +5,14 @@ import { Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useRazorpay } from "@/hooks/useRazorpay";
 
 const Settings = () => {
   const { user } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState("INR");
+  const { checkout, loading: paymentLoading, SUPPORTED_CURRENCIES } = useRazorpay();
 
   useEffect(() => {
     if (!user) return;
@@ -37,6 +40,19 @@ const Settings = () => {
       toast.success("Profile updated!");
     }
     setSaving(false);
+  };
+
+  const handleUpgrade = () => {
+    if (!user) return;
+    checkout(selectedCurrency, user.email || "", displayName || user.email || "");
+  };
+
+  const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
+
+  // Display price map
+  const displayPrices: Record<string, string> = {
+    INR: "₹999", USD: "$12", EUR: "€11", GBP: "£10",
+    AUD: "A$18", CAD: "C$16", SGD: "S$16", AED: "AED 45", JPY: "¥1800",
   };
 
   return (
@@ -87,18 +103,47 @@ const Settings = () => {
             </div>
           </div>
           <div className="rounded-lg border-2 border-gold p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-foreground">Pro Plan — $12/month</p>
-                <ul className="mt-2 space-y-1">
-                  {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Check className="h-3 w-3 text-gold" /> {f}
-                    </li>
-                  ))}
-                </ul>
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-foreground">
+                    Pro Plan — {displayPrices[selectedCurrency] || displayPrices.INR}/month
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    {["Unlimited rewrites", "All contexts", "Daily lessons", "Full history"].map((f) => (
+                      <li key={f} className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Check className="h-3 w-3 text-gold" /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <Button variant="gold" size="sm">Upgrade</Button>
+
+              {/* Currency selector */}
+              <div className="flex items-center gap-3">
+                <label className="text-sm font-medium text-foreground">Currency:</label>
+                <select
+                  value={selectedCurrency}
+                  onChange={(e) => setSelectedCurrency(e.target.value)}
+                  className="rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {SUPPORTED_CURRENCIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.symbol} — {c.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <Button
+                variant="gold"
+                size="sm"
+                onClick={handleUpgrade}
+                disabled={paymentLoading}
+                className="w-fit"
+              >
+                {paymentLoading ? "Processing..." : "Upgrade Now"}
+              </Button>
             </div>
           </div>
         </div>
