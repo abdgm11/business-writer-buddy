@@ -8,12 +8,24 @@ import { toast } from "sonner";
 import { useRazorpay } from "@/hooks/useRazorpay";
 import { useUserPlan } from "@/hooks/useUserPlan";
 import { PaymentHistory } from "@/components/PaymentHistory";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const Settings = () => {
   const { user } = useAuth();
   const [displayName, setDisplayName] = useState("");
   const [saving, setSaving] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
+  const [cancelling, setCancelling] = useState(false);
   const { checkout, loading: paymentLoading, SUPPORTED_CURRENCIES } = useRazorpay();
   const { isPro, loading: planLoading, refetch: refetchPlan } = useUserPlan();
 
@@ -48,6 +60,27 @@ const Settings = () => {
   const handleUpgrade = () => {
     if (!user) return;
     checkout(selectedCurrency, user.email || "", displayName || user.email || "", refetchPlan);
+  };
+
+  const handleCancel = async () => {
+    if (!user) return;
+    setCancelling(true);
+    try {
+      const { data: sess } = await supabase.auth.getSession();
+      const { error } = await supabase.functions.invoke("cancel-subscription", {
+        headers: { Authorization: `Bearer ${sess?.session?.access_token}` },
+      });
+      if (error) {
+        toast.error("Failed to cancel subscription. Please try again.");
+      } else {
+        toast.success("Subscription cancelled. You're now on the Free plan.");
+        refetchPlan();
+      }
+    } catch {
+      toast.error("Something went wrong.");
+    } finally {
+      setCancelling(false);
+    }
   };
 
   const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
@@ -113,6 +146,29 @@ const Settings = () => {
                   </ul>
                 </div>
                 <span className="rounded-full bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">Active</span>
+              </div>
+              <div className="mt-4 pt-3 border-t border-border">
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm" disabled={cancelling} className="text-destructive hover:text-destructive">
+                      {cancelling ? "Cancelling..." : "Cancel Subscription"}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Cancel Pro subscription?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        You'll be downgraded to the Free plan immediately and limited to 3 rewrites per day. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Keep Pro</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleCancel} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        Yes, cancel
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           ) : (
