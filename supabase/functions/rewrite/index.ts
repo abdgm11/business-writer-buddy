@@ -280,6 +280,25 @@ You must respond using the "rewrite_text" tool.`;
       }));
     }
 
+    // Server-side insert into rewrites for authenticated users (ensures rate limit integrity)
+    if (userId) {
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      );
+      const inputWordCount = text.trim().split(/\s+/).length;
+      await adminClient.from("rewrites").insert({
+        user_id: userId,
+        original_text: text.trim(),
+        polished_text: result.polished,
+        corrections: result.corrections,
+        context: safeContext,
+        tone: safeTone,
+        word_count: inputWordCount,
+        score: Math.min(100, 70 + (result.corrections?.length ?? 0) * 5),
+      });
+    }
+
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
