@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { gtagEvent } from "@/lib/gtag";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, Copy, CheckCircle2, Gift, Users, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { useRazorpay } from "@/hooks/useRazorpay";
 import { useUserPlan } from "@/hooks/useUserPlan";
+import { useReferral } from "@/hooks/useReferral";
 import { PaymentHistory } from "@/components/PaymentHistory";
 import {
   AlertDialog,
@@ -28,8 +29,10 @@ const Settings = () => {
   const [selectedCurrency, setSelectedCurrency] = useState("INR");
   const [cancelling, setCancelling] = useState(false);
   const [yearly, setYearly] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { checkout, loading: paymentLoading, SUPPORTED_CURRENCIES } = useRazorpay();
   const { isPro, loading: planLoading, refetch: refetchPlan } = useUserPlan();
+  const { referralCode, totalReferred, bonusEarned, loading: refLoading } = useReferral();
 
   useEffect(() => {
     if (!user) return;
@@ -37,7 +40,7 @@ const Settings = () => {
       .from("profiles")
       .select("display_name")
       .eq("user_id", user.id)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
         if (data?.display_name) setDisplayName(data.display_name);
       });
@@ -90,6 +93,18 @@ const Settings = () => {
     }
   };
 
+  const referralLink = referralCode
+    ? `${window.location.origin}/login?ref=${referralCode}`
+    : "";
+
+  const copyReferralLink = () => {
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopied(true);
+      toast.success("Referral link copied!");
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   const currentCurrencyInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency);
 
   const monthlyPrices: Record<string, string> = {
@@ -138,6 +153,55 @@ const Settings = () => {
               {saving ? "Saving..." : "Save Changes"}
             </Button>
           </div>
+        </div>
+
+        {/* Referral Program */}
+        <div className="rounded-xl border bg-card p-6 shadow-elegant">
+          <div className="flex items-center gap-2 mb-4">
+            <Gift className="h-5 w-5 text-gold" />
+            <h2 className="text-lg font-semibold text-foreground font-sans">Invite Friends, Earn Rewrites</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Share your referral link. You earn <span className="font-semibold text-gold">5 bonus rewrites</span> per friend who signs up, 
+            and they get <span className="font-semibold text-gold">3 bonus rewrites</span> too!
+          </p>
+
+          {refLoading ? (
+            <div className="h-10 bg-muted rounded-lg animate-pulse" />
+          ) : referralCode ? (
+            <>
+              <div className="flex gap-2 mb-4">
+                <input
+                  className="flex-1 rounded-lg border bg-background p-3 text-sm text-foreground font-mono select-all"
+                  value={referralLink}
+                  readOnly
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <Button variant="outline" size="sm" onClick={copyReferralLink} className="shrink-0">
+                  {copied ? <CheckCircle2 className="h-4 w-4 text-gold" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-muted p-3 text-center">
+                  <Users className="h-4 w-4 text-gold mx-auto mb-1" />
+                  <p className="text-xl font-bold text-foreground">{totalReferred}</p>
+                  <p className="text-xs text-muted-foreground">Friends Referred</p>
+                </div>
+                <div className="rounded-lg bg-muted p-3 text-center">
+                  <Sparkles className="h-4 w-4 text-gold mx-auto mb-1" />
+                  <p className="text-xl font-bold text-foreground">{bonusEarned}</p>
+                  <p className="text-xs text-muted-foreground">Bonus Rewrites</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground mt-3">
+                Maximum 50 bonus rewrites (10 referrals). Pro users have unlimited rewrites regardless.
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground">Referral code generating…</p>
+          )}
         </div>
 
         {/* Subscription */}

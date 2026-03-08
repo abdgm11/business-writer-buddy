@@ -9,6 +9,7 @@ export function useRemainingRewrites() {
   const { user } = useAuth();
   const { isPro, loading: planLoading } = useUserPlan();
   const [used, setUsed] = useState(0);
+  const [bonusRewrites, setBonusRewrites] = useState(0);
   const [loading, setLoading] = useState(true);
 
   const fetchUsage = useCallback(async () => {
@@ -19,13 +20,21 @@ export function useRemainingRewrites() {
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
 
-    const { count } = await supabase
-      .from("rewrites")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .gte("created_at", todayStart.toISOString());
+    const [usageRes, profileRes] = await Promise.all([
+      supabase
+        .from("rewrites")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte("created_at", todayStart.toISOString()),
+      supabase
+        .from("profiles")
+        .select("bonus_rewrites")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
 
-    setUsed(count ?? 0);
+    setUsed(usageRes.count ?? 0);
+    setBonusRewrites(profileRes.data?.bonus_rewrites ?? 0);
     setLoading(false);
   }, [user, isPro]);
 
@@ -33,7 +42,17 @@ export function useRemainingRewrites() {
     if (!planLoading) fetchUsage();
   }, [planLoading, fetchUsage]);
 
-  const remaining = Math.max(0, FREE_DAILY_LIMIT - used);
+  const effectiveLimit = FREE_DAILY_LIMIT + bonusRewrites;
+  const remaining = Math.max(0, effectiveLimit - used);
 
-  return { remaining, used, limit: FREE_DAILY_LIMIT, isPro, loading: loading || planLoading, refetch: fetchUsage };
+  return {
+    remaining,
+    used,
+    limit: effectiveLimit,
+    baseLimit: FREE_DAILY_LIMIT,
+    bonusRewrites,
+    isPro,
+    loading: loading || planLoading,
+    refetch: fetchUsage,
+  };
 }
