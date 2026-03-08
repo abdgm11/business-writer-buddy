@@ -1,9 +1,9 @@
 import { AppLayout } from "@/components/AppLayout";
-import { Flame, FileText, BookOpen, TrendingUp } from "lucide-react";
+import { Flame, FileText, BookOpen, TrendingUp, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 
 const stats = [
   { label: "Words Polished", value: "2,847", icon: FileText, change: "+340 this week" },
-  { label: "Improvement Streak", value: "12 days", icon: Flame, change: "Keep it up!" },
   { label: "Lessons Completed", value: "24", icon: BookOpen, change: "+3 this week" },
   { label: "Skill Level", value: "Advanced", icon: TrendingUp, change: "Up from Intermediate" },
 ];
@@ -16,6 +16,9 @@ const recentHistory = [
   { date: "Mar 4", context: "Email", preview: "Follow-up with potential client...", score: 90 },
 ];
 
+const streakDays = 12;
+const streakGoal = 30;
+
 const Dashboard = () => {
   return (
     <AppLayout>
@@ -25,8 +28,56 @@ const Dashboard = () => {
           <p className="text-muted-foreground mt-1">Track your writing progress and improvement over time.</p>
         </div>
 
+        {/* Streak Hero Card */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" as const }}
+          className="relative overflow-hidden rounded-2xl gradient-navy p-6 md:p-8 shadow-elegant"
+        >
+          <div className="absolute top-0 right-0 w-48 h-48 opacity-10">
+            <Flame className="w-full h-full text-gold" />
+          </div>
+          <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
+            {/* Streak Number */}
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-gold shadow-gold">
+                <Flame className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <div>
+                <p className="text-5xl md:text-6xl font-bold text-primary-foreground font-display leading-none">
+                  {streakDays}
+                </p>
+                <p className="text-sm text-primary-foreground/70 mt-1">day streak</p>
+              </div>
+            </div>
+
+            {/* Progress + Message */}
+            <div className="flex-1 w-full md:w-auto">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="h-4 w-4 text-gold" />
+                <p className="text-sm font-medium text-primary-foreground">
+                  {streakGoal - streakDays} days to your {streakGoal}-day goal!
+                </p>
+              </div>
+              {/* Progress bar */}
+              <div className="w-full h-3 rounded-full bg-primary-foreground/10 overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(streakDays / streakGoal) * 100}%` }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" as const }}
+                  className="h-full rounded-full gradient-gold"
+                />
+              </div>
+              <p className="text-xs text-primary-foreground/50 mt-2">
+                Practice daily to keep your streak. Resets after 24 hours of inactivity.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
         {/* Stats Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-3">
           {stats.map((s) => (
             <div key={s.label} className="rounded-xl border bg-card p-5 shadow-elegant">
               <div className="flex items-center justify-between mb-3">
