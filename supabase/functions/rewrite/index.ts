@@ -7,6 +7,9 @@ const corsHeaders = {
 };
 
 const FREE_DAILY_LIMIT = 3;
+const MAX_CHARS = 3000;
+const ALLOWED_CONTEXTS = ["email", "report", "presentation", "linkedin", "slack"];
+const ALLOWED_TONES = ["formal", "friendly", "assertive", "diplomatic"];
 
 function decodeJwtPayload(token: string): Record<string, unknown> | null {
   try {
