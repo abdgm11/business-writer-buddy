@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/AppLayout";
+import { CorrectionItem } from "@/components/CorrectionItem";
+import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare } from "lucide-react";
 import { ArrowRight, Mail, FileText, Presentation, Linkedin, MessageSquare } from "lucide-react";
 
 const contexts = [
