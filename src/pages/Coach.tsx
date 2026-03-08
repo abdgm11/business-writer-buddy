@@ -33,7 +33,7 @@ const mockResult = {
 const Coach = () => {
   const [text, setText] = useState("");
   const [context, setContext] = useState("email");
-  const [result, setResult] = useState<typeof mockResult | null>(null);
+  const [tone, setTone] = useState("formal");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
