@@ -121,29 +121,43 @@ const Landing = () => {
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {[
-              { icon: Sparkles, title: "AI-Powered Rewriting", desc: "Context-aware rewrites for emails, reports, presentations, LinkedIn posts, and Slack messages." },
-              { icon: BookOpen, title: "Learn as You Write", desc: "Color-coded corrections with explanations of what changed and why — build your skills with every use." },
-              { icon: Zap, title: "Daily Lessons", desc: "5-minute grammar and tone challenges tailored to your most common mistakes." },
-              { icon: Globe, title: "Multiple Contexts", desc: "Switch between Email, Report, Presentation, LinkedIn, and Slack modes for context-perfect results." },
-              { icon: Shield, title: "Privacy First", desc: "Your writing stays private. We never share or use your content for training." },
-              { icon: Star, title: "Track Your Progress", desc: "See your improvement streak, words polished, and lessons completed over time." },
-            ].map((f, i) => (
-              <motion.div
-                key={f.title}
-                custom={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="rounded-xl border bg-background p-6 shadow-elegant transition-all hover:shadow-lg"
-              >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg gradient-navy">
-                  <f.icon className="h-5 w-5 text-gold" />
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-foreground font-sans">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
+              { icon: Sparkles, title: "AI-Powered Rewriting", desc: "Context-aware rewrites for emails, reports, presentations, LinkedIn posts, and Slack messages.", link: null },
+              { icon: Mail, title: "Free Email Tone Checker", desc: "Instantly analyze your email's tone, professionalism, and clarity — no signup required.", link: "/email-tone-checker" },
+              { icon: BookOpen, title: "Learn as You Write", desc: "Color-coded corrections with explanations of what changed and why — build your skills with every use.", link: null },
+              { icon: Zap, title: "Daily Lessons", desc: "5-minute grammar and tone challenges tailored to your most common mistakes.", link: null },
+              { icon: Globe, title: "Multiple Contexts", desc: "Switch between Email, Report, Presentation, LinkedIn, and Slack modes for context-perfect results.", link: null },
+              { icon: Shield, title: "Privacy First", desc: "Your writing stays private. We never share or use your content for training.", link: null },
+              { icon: Star, title: "Track Your Progress", desc: "See your improvement streak, words polished, and lessons completed over time.", link: null },
+            ].map((f, i) => {
+              const content = (
+                <>
+                  <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg gradient-navy">
+                    <f.icon className="h-5 w-5 text-gold" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-semibold text-foreground font-sans">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+                  {f.link && (
+                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-gold">
+                      Try it free <ArrowRight className="h-3.5 w-3.5" />
+                    </span>
+                  )}
+                </>
+              );
+
+              return (
+                <motion.div
+                  key={f.title}
+                  custom={i}
+                  variants={fadeUp}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className={`rounded-xl border bg-background p-6 shadow-elegant transition-all hover:shadow-lg ${f.link ? "ring-1 ring-gold/20 hover:ring-gold/40 cursor-pointer" : ""}`}
+                >
+                  {f.link ? <Link to={f.link} className="block">{content}</Link> : content}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
