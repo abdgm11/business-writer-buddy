@@ -1,8 +1,44 @@
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Settings = () => {
+  const { user } = useAuth();
+  const [displayName, setDisplayName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.display_name) setDisplayName(data.display_name);
+      });
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ display_name: displayName })
+      .eq("user_id", user.id);
+
+    if (error) {
+      toast.error("Failed to save changes");
+    } else {
+      toast.success("Profile updated!");
+    }
+    setSaving(false);
+  };
+
   return (
     <AppLayout>
       <div className="space-y-8 max-w-2xl">
@@ -16,14 +52,25 @@ const Settings = () => {
           <h2 className="text-lg font-semibold text-foreground font-sans mb-4">Profile</h2>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-foreground">Name</label>
-              <input className="mt-1 w-full rounded-lg border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring" placeholder="Your name" />
+              <label className="text-sm font-medium text-foreground">Display Name</label>
+              <input
+                className="mt-1 w-full rounded-lg border bg-background p-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Your name"
+              />
             </div>
             <div>
               <label className="text-sm font-medium text-foreground">Email</label>
-              <input className="mt-1 w-full rounded-lg border bg-background p-3 text-sm text-muted-foreground" value="user@example.com" disabled />
+              <input
+                className="mt-1 w-full rounded-lg border bg-background p-3 text-sm text-muted-foreground"
+                value={user?.email || ""}
+                disabled
+              />
             </div>
-            <Button variant="hero" size="sm">Save Changes</Button>
+            <Button variant="hero" size="sm" onClick={handleSave} disabled={saving}>
+              {saving ? "Saving..." : "Save Changes"}
+            </Button>
           </div>
         </div>
 
