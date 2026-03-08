@@ -283,6 +283,83 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Writing Tips */}
+      <section className="py-20 bg-muted/30">
+        <div className="container">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
+            <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold text-foreground md:text-4xl">
+              Business Writing Tips
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={1} className="mt-3 text-muted-foreground text-lg max-w-2xl mx-auto">
+              Quick tips to level up your professional English — no fluff, just what works.
+            </motion.p>
+          </motion.div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              { title: "How to Write a Professional Email", summary: "Start with a clear subject line, keep paragraphs short, and always end with a specific call to action. Avoid filler phrases like 'I hope this email finds you well.'", icon: Mail },
+              { title: "Avoid These Common Grammar Mistakes", summary: "Confusing 'affect' vs 'effect,' misusing apostrophes, and dangling modifiers are the top errors non-native speakers make in business writing.", icon: BookOpen },
+              { title: "How to Sound Confident in Writing", summary: "Replace hedging language ('I think maybe we could…') with direct statements ('I recommend…'). Use active voice and specific numbers to build authority.", icon: Zap },
+              { title: "LinkedIn Post Writing Formula", summary: "Hook readers in the first line, tell a brief story or share a lesson, and end with a question. Keep sentences under 15 words for readability.", icon: Globe },
+              { title: "Report Writing for Non-Native Speakers", summary: "Use an executive summary, bullet points for key findings, and plain English over jargon. Structure: Context → Findings → Recommendations.", icon: FileText },
+              { title: "Tone Adjustment: Formal vs Friendly", summary: "Match your tone to your audience. Use 'Dear Mr. Smith' for formal contexts and 'Hi Sarah' for friendly ones. ProseAI can adjust this automatically.", icon: Sparkles },
+            ].map((tip, i) => (
+              <motion.article
+                key={tip.title}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={i}
+                className="rounded-xl border bg-card p-6 shadow-elegant hover:shadow-lg transition-shadow"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted mb-4">
+                  <tip.icon className="h-5 w-5 text-gold" />
+                </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{tip.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{tip.summary}</p>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20">
+        <div className="container max-w-3xl">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12">
+            <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-bold text-foreground md:text-4xl">
+              Frequently Asked Questions
+            </motion.h2>
+          </motion.div>
+          <div className="space-y-4">
+            {[
+              { q: "Is ProseAI free to use?", a: "Yes! You get 3 free rewrites per day. Upgrade to Pro for unlimited rewrites, all writing contexts, daily lessons, and full history." },
+              { q: "What types of writing can ProseAI help with?", a: "ProseAI supports emails, reports, presentations, LinkedIn posts, and Slack messages. Choose your context and tone, and get tailored rewrites with grammar explanations." },
+              { q: "How is ProseAI different from Grammarly?", a: "ProseAI is built specifically for non-native English speakers in business settings. It doesn't just fix grammar — it rewrites your text to sound like a native professional and explains every change so you learn." },
+              { q: "Is my writing data secure?", a: "Absolutely. Your text is processed securely and never shared with third parties. Pro users get full history stored in their private account." },
+              { q: "What languages does ProseAI support?", a: "ProseAI accepts input in English (including non-native English) and polishes it to native-level professional English. It's designed for speakers of any first language." },
+              { q: "Can I use ProseAI on mobile?", a: "Yes! ProseAI works in any modern browser on desktop, tablet, and mobile devices. No app download required." },
+            ].map((faq, i) => (
+              <motion.details
+                key={faq.q}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                custom={i}
+                className="group rounded-xl border bg-card shadow-elegant"
+              >
+                <summary className="flex cursor-pointer items-center justify-between p-5 text-foreground font-medium hover:text-gold transition-colors">
+                  {faq.q}
+                  <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-90" />
+                </summary>
+                <p className="px-5 pb-5 text-sm text-muted-foreground leading-relaxed">{faq.a}</p>
+              </motion.details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20">
         <div className="container">
