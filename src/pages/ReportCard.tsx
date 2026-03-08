@@ -3,6 +3,8 @@ import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useReportCardData } from "@/hooks/useReportCardData";
+import { useBadges } from "@/hooks/useBadges";
+import { BadgesSection } from "@/components/BadgesSection";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -36,6 +38,16 @@ const ReportCard = () => {
   const { loading, stats } = useReportCardData();
   const cardRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
+
+  const badges = useBadges({
+    totalRewrites: stats?.totalRewrites ?? 0,
+    totalWords: stats?.wordsPolished ?? 0,
+    streak: stats?.streak ?? 0,
+    bestScore: stats?.bestScore ?? null,
+    avgScore: stats?.avgScore ?? null,
+    uniqueContexts: stats?.contextBreakdown.length ?? 0,
+    daysPracticed: stats?.daysPracticed ?? 0,
+  });
 
   const period = stats
     ? `${formatDate(stats.firstDate)} – ${formatDate(stats.lastDate)}`
@@ -229,6 +241,10 @@ const ReportCard = () => {
                 </div>
               </div>
             )}
+
+
+            {/* Badges */}
+            <BadgesSection badges={badges} variant="report" />
 
             {/* Footer */}
             <div className="flex items-center justify-between pt-4 border-t">

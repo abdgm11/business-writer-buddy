@@ -115,6 +115,19 @@ export function useDashboardData() {
     { label: "Best Score", value: bestScore ? bestScore.toString() : "—", icon: Target, change: bestScore ? "Your personal best!" : "No scores yet" },
   ];
 
+  const uniqueContexts = contextBreakdown.length;
+  const uniqueDays = new Set(allRewrites.map((r) => r.created_at.split("T")[0]));
+
+  const badgeInput = {
+    totalRewrites: allRewrites.length,
+    totalWords: totalWords,
+    streak,
+    bestScore: bestScore ?? null,
+    avgScore: avgScore ?? null,
+    uniqueContexts,
+    daysPracticed: uniqueDays.size,
+  };
+
   return {
     loading,
     error,
@@ -127,5 +140,6 @@ export function useDashboardData() {
     contextBreakdown,
     toneBreakdown,
     recentRewrites: allRewrites.slice(0, 10),
+    badgeInput,
   };
 }

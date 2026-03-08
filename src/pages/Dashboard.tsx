@@ -1,5 +1,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useBadges } from "@/hooks/useBadges";
+import { BadgesSection } from "@/components/BadgesSection";
 import DashboardSkeleton from "@/components/dashboard/DashboardSkeleton";
 import StreakCard from "@/components/dashboard/StreakCard";
 import StatsGrid from "@/components/dashboard/StatsGrid";
@@ -15,8 +17,10 @@ const Dashboard = () => {
   const {
     loading, error, retry, streak, streakGoal, stats,
     weeklyActivity, scoreTrend, contextBreakdown,
-    toneBreakdown, recentRewrites,
+    toneBreakdown, recentRewrites, badgeInput,
   } = useDashboardData();
+
+  const badges = useBadges(badgeInput);
 
   if (loading) {
     return <AppLayout><DashboardSkeleton /></AppLayout>;
@@ -48,6 +52,7 @@ const Dashboard = () => {
 
         <StreakCard streak={streak} streakGoal={streakGoal} />
         <StatsGrid stats={stats} />
+        <BadgesSection badges={badges} variant="dashboard" />
 
         <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           <WeeklyActivityChart data={weeklyActivity} />
