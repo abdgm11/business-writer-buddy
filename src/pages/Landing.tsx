@@ -16,6 +16,14 @@ const fadeUp = {
 };
 
 const Landing = () => {
+  const [totalRewrites, setTotalRewrites] = useState<number>(0);
+
+  useEffect(() => {
+    supabase.rpc("get_total_rewrites").then(({ data }) => {
+      if (data) setTotalRewrites(Number(data));
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}
