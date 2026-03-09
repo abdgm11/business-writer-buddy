@@ -14,6 +14,9 @@ import Settings from "./pages/Settings";
 import ReportCard from "./pages/ReportCard";
 import Support from "./pages/Support";
 import EmailToneChecker from "./pages/EmailToneChecker";
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
