@@ -10,6 +10,8 @@ const navLinks = [
   { href: "#pricing", label: "Pricing" },
   { href: "#testimonials", label: "Testimonials" },
   { href: "/email-tone-checker", label: "Tone Checker", isRoute: true },
+  { href: "/blog", label: "Blog", isRoute: true },
+  { href: "/about", label: "About", isRoute: true },
 ];
 
 export const LandingNavbar = () => {
