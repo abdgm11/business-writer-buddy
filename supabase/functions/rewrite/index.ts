@@ -249,6 +249,7 @@ You must respond using the "rewrite_text" tool.`;
       }),
     });
 
+    console.log("[rewrite] AI response status:", response.status);
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
