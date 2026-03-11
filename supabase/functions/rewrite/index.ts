@@ -272,6 +272,7 @@ You must respond using the "rewrite_text" tool.`;
     }
 
     const data = await response.json();
+    console.log("[rewrite] AI response parsed. Extracting tool call...");
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
     if (!toolCall?.function?.arguments) {
