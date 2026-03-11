@@ -317,6 +317,7 @@ You must respond using the "rewrite_text" tool.`;
       });
     }
 
+    console.log("[rewrite] Success. Returning result.");
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
