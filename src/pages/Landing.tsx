@@ -355,12 +355,12 @@ const Landing = () => {
       {/* CTA */}
       <section className="py-20">
         <div className="container">
-          <div className="mx-auto max-w-3xl rounded-2xl gradient-navy p-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold text-primary-foreground md:text-4xl">
+          <div className="mx-auto max-w-3xl rounded-2xl bg-primary p-12 text-center shadow-lg">
+            <h2 className="mb-4 text-3xl font-bold text-primary-foreground md:text-4xl font-display">
               Ready to Write Like a Pro?
             </h2>
-            <p className="mb-8 text-primary-foreground/70 text-lg">
-              Join thousands of non-native speakers who now write with confidence.
+            <p className="mb-8 text-primary-foreground/90 text-lg leading-relaxed">
+              Join thousands of non-native speakers who now write with confidence. Start polishing your emails, reports, and messages today.
             </p>
             <Link to="/login">
               <Button variant="gold" size="lg">
