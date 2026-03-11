@@ -30,11 +30,14 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log("[rewrite] Request received:", req.method);
+
     // --- Auth: verify JWT with getClaims() ---
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
+      console.log("[rewrite] Authenticating user...");
       const supabaseAuth = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -43,12 +46,17 @@ Deno.serve(async (req) => {
       const { data: { user }, error } = await supabaseAuth.auth.getUser();
       if (!error && user) {
         userId = user.id;
+        console.log("[rewrite] Authenticated user:", userId);
+      } else {
+        console.log("[rewrite] Auth failed or anonymous request");
       }
     }
 
     const { text, context, tone } = await req.json();
+    console.log("[rewrite] Input received - context:", context, "tone:", tone, "text length:", text?.length);
 
     if (!text || typeof text !== "string" || text.trim().length === 0) {
+      console.log("[rewrite] Validation failed: text is empty or invalid");
       return new Response(JSON.stringify({ error: "Text is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -56,6 +64,7 @@ Deno.serve(async (req) => {
     }
 
     if (text.length > MAX_CHARS) {
+      console.log("[rewrite] Validation failed: text too long:", text.length);
       return new Response(JSON.stringify({ error: "Text too long. Maximum 3000 characters allowed." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -158,9 +167,14 @@ Deno.serve(async (req) => {
     }
 
     // --- AI rewrite ---
+    console.log("[rewrite] Rate limiting passed. Preparing AI call...");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("[rewrite] LOVABLE_API_KEY is not configured!");
+      return new Response(
+        JSON.stringify({ error: "AI service not configured. Please contact support." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const toneInstructions: Record<string, string> = {
@@ -185,6 +199,7 @@ CONTEXT: ${contextInstructions[safeContext] || contextInstructions.email}
 
 You must respond using the "rewrite_text" tool.`;
 
+    console.log("[rewrite] Calling AI gateway...");
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -234,6 +249,7 @@ You must respond using the "rewrite_text" tool.`;
       }),
     });
 
+    console.log("[rewrite] AI response status:", response.status);
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
@@ -256,6 +272,7 @@ You must respond using the "rewrite_text" tool.`;
     }
 
     const data = await response.json();
+    console.log("[rewrite] AI response parsed. Extracting tool call...");
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
     if (!toolCall?.function?.arguments) {
@@ -267,6 +284,7 @@ You must respond using the "rewrite_text" tool.`;
     }
 
     const result = JSON.parse(toolCall.function.arguments);
+    console.log("[rewrite] Rewrite complete. Corrections:", result.corrections?.length ?? 0);
 
     // Sanitize AI output to prevent stored XSS
     if (result.polished) {
@@ -299,6 +317,7 @@ You must respond using the "rewrite_text" tool.`;
       });
     }
 
+    console.log("[rewrite] Success. Returning result.");
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
