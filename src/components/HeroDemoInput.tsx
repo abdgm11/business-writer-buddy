@@ -127,7 +127,7 @@ export const HeroDemoInput = () => {
             disabled={loading}
           />
           <div className="flex items-center justify-between">
-            <Button variant="hero" onClick={handleDemo} className="w-full sm:w-auto" disabled={loading}>
+            <Button variant="default" size="lg" onClick={handleDemo} className="w-full sm:w-auto" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Polishing...
