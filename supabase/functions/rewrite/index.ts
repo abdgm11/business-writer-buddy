@@ -30,11 +30,14 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log("[rewrite] Request received:", req.method);
+
     // --- Auth: verify JWT with getClaims() ---
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
+      console.log("[rewrite] Authenticating user...");
       const supabaseAuth = createClient(
         Deno.env.get("SUPABASE_URL")!,
         Deno.env.get("SUPABASE_ANON_KEY")!,
@@ -43,6 +46,9 @@ Deno.serve(async (req) => {
       const { data: { user }, error } = await supabaseAuth.auth.getUser();
       if (!error && user) {
         userId = user.id;
+        console.log("[rewrite] Authenticated user:", userId);
+      } else {
+        console.log("[rewrite] Auth failed or anonymous request");
       }
     }
 
