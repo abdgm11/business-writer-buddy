@@ -6,13 +6,13 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
-  { href: "#features", label: "Features" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#testimonials", label: "Testimonials" },
-  { href: "/email-tone-checker", label: "Tone Checker", isRoute: true },
-  { href: "/blog", label: "Blog", isRoute: true },
-  { href: "/about", label: "About", isRoute: true },
-];
+{ href: "#features", label: "Features" },
+{ href: "#pricing", label: "Pricing" },
+{ href: "#testimonials", label: "Testimonials" },
+{ href: "/email-tone-checker", label: "Tone Checker", isRoute: true },
+{ href: "/blog", label: "Blog", isRoute: true },
+{ href: "/about", label: "About", isRoute: true }];
+
 
 export const LandingNavbar = () => {
   const [open, setOpen] = useState(false);
@@ -32,23 +32,23 @@ export const LandingNavbar = () => {
         {/* Desktop nav */}
         <div className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) =>
-            link.isRoute ? (
-              <Link
-                key={link.href}
-                to={link.href}
-                className="text-sm font-medium text-gold hover:text-gold-dark transition-colors"
-              >
+          link.isRoute ?
+          <Link
+            key={link.href}
+            to={link.href}
+            className="text-sm font-medium transition-colors text-muted-foreground">
+            
                 {link.label}
-              </Link>
-            ) : (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              </Link> :
+
+          <a
+            key={link.href}
+            href={link.href}
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            
                 {link.label}
               </a>
-            )
+
           )}
         </div>
 
@@ -70,8 +70,8 @@ export const LandingNavbar = () => {
           <button
             onClick={() => setOpen(!open)}
             className="flex h-10 w-10 items-center justify-center rounded-lg border bg-card"
-            aria-label="Toggle menu"
-          >
+            aria-label="Toggle menu">
+            
             {open ? <X className="h-5 w-5 text-foreground" /> : <Menu className="h-5 w-5 text-foreground" />}
           </button>
         </div>
@@ -79,36 +79,36 @@ export const LandingNavbar = () => {
 
       {/* Mobile slide-down menu */}
       <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className="overflow-hidden border-t bg-background md:hidden"
-          >
+        {open &&
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.25, ease: "easeInOut" }}
+          className="overflow-hidden border-t bg-background md:hidden">
+          
             <div className="container flex flex-col gap-1 py-4">
               {navLinks.map((link) =>
-                link.isRoute ? (
-                  <Link
-                    key={link.href}
-                    to={link.href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-4 py-3 text-sm font-medium text-gold hover:bg-muted transition-colors"
-                  >
+            link.isRoute ?
+            <Link
+              key={link.href}
+              to={link.href}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-4 py-3 text-sm font-medium text-gold hover:bg-muted transition-colors">
+              
                     {link.label}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  >
+                  </Link> :
+
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+              
                     {link.label}
                   </a>
-                )
-              )}
+
+            )}
               <div className="mt-3 flex flex-col gap-2 px-4">
                 <Link to="/login" onClick={() => setOpen(false)}>
                   <Button variant="outline" className="w-full">Log in</Button>
@@ -121,8 +121,8 @@ export const LandingNavbar = () => {
               </div>
             </div>
           </motion.div>
-        )}
+        }
       </AnimatePresence>
-    </nav>
-  );
+    </nav>);
+
 };
