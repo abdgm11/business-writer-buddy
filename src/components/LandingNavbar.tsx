@@ -58,9 +58,9 @@ export const LandingNavbar = () => {
             <Button variant="ghost" size="sm">Log in</Button>
           </Link>
           <Link to="/login">
-            <Button variant="hero" size="sm">
-              Get Started Free <ArrowRight className="ml-1 h-3.5 w-3.5" />
-            </Button>
+             <Button variant="default" size="xl">
+               Get Started Free <ArrowRight className="ml-1 h-3.5 w-3.5" />
+             </Button>
           </Link>
         </div>
 
@@ -114,9 +114,9 @@ export const LandingNavbar = () => {
                   <Button variant="outline" className="w-full">Log in</Button>
                 </Link>
                 <Link to="/login" onClick={() => setOpen(false)}>
-                  <Button variant="hero" className="w-full">
-                    Get Started Free <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                  </Button>
+                   <Button variant="default" size="xl" className="w-full">
+                     Get Started Free <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                   </Button>
                 </Link>
               </div>
             </div>

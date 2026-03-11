@@ -99,7 +99,7 @@ const About = () => (
           <h2 className="text-2xl font-bold text-foreground">Ready to write with confidence?</h2>
           <p className="mt-2 text-muted-foreground">Start free. No credit card required.</p>
           <Link to="/login" className="mt-6 inline-block">
-            <Button variant="hero" size="lg">
+            <Button variant="default" size="xl">
               Get Started Free <ArrowRight className="ml-1 h-4 w-4" />
             </Button>
           </Link>
