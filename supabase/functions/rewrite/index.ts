@@ -284,6 +284,7 @@ You must respond using the "rewrite_text" tool.`;
     }
 
     const result = JSON.parse(toolCall.function.arguments);
+    console.log("[rewrite] Rewrite complete. Corrections:", result.corrections?.length ?? 0);
 
     // Sanitize AI output to prevent stored XSS
     if (result.polished) {
