@@ -53,8 +53,10 @@ Deno.serve(async (req) => {
     }
 
     const { text, context, tone } = await req.json();
+    console.log("[rewrite] Input received - context:", context, "tone:", tone, "text length:", text?.length);
 
     if (!text || typeof text !== "string" || text.trim().length === 0) {
+      console.log("[rewrite] Validation failed: text is empty or invalid");
       return new Response(JSON.stringify({ error: "Text is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -62,6 +64,7 @@ Deno.serve(async (req) => {
     }
 
     if (text.length > MAX_CHARS) {
+      console.log("[rewrite] Validation failed: text too long:", text.length);
       return new Response(JSON.stringify({ error: "Text too long. Maximum 3000 characters allowed." }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
