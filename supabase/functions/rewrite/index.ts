@@ -167,9 +167,14 @@ Deno.serve(async (req) => {
     }
 
     // --- AI rewrite ---
+    console.log("[rewrite] Rate limiting passed. Preparing AI call...");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("[rewrite] LOVABLE_API_KEY is not configured!");
+      return new Response(
+        JSON.stringify({ error: "AI service not configured. Please contact support." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const toneInstructions: Record<string, string> = {
