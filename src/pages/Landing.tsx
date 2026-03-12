@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Check, Star, Globe, BookOpen, Zap, Shield, Mail, FileText } from "lucide-react";
+import { ArrowRight, Check, Star, Globe, BookOpen, Zap, Shield, Mail, FileText, FingerprintPattern } from "lucide-react";
 import { Link } from "react-router-dom";
 import { HeroDemoInput } from "@/components/HeroDemoInput";
 import { LandingNavbar } from "@/components/LandingNavbar";
@@ -376,7 +376,7 @@ const Landing = () => {
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded gradient-navy">
-              <Sparkles className="h-3 w-3 text-gold" />
+              <FingerprintPattern className="h-3 w-3 text-gold" />
             </div>
             <span className="text-sm font-semibold text-foreground">ProseAI</span>
           </div>
