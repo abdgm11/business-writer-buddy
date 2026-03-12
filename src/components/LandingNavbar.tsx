@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Menu, X, FingerprintPattern } from "lucide-react";
+import { ArrowRight, Menu, X, Fingerprint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,7 +22,7 @@ export const LandingNavbar = () => {
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-navy">
-            <FingerprintPattern className="h-4 w-4 text-gold" />
+            <Fingerprint className="h-4 w-4 text-gold" />
           </div>
           <span className="text-xl font-bold text-foreground">
             Prose<span className="text-gold">AI</span>
