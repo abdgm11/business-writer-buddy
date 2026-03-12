@@ -338,19 +338,74 @@ const EmailToneChecker = () => {
                 </div>
               )}
 
-              {/* CTA */}
-              <div className="rounded-xl border-2 border-gold bg-card p-6 text-center shadow-gold">
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Want your emails <span className="text-gradient-gold">automatically rewritten?</span>
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  ProseAI rewrites your emails in polished Business English and explains every change — so you learn as you write.
-                </p>
-                <Link to="/coach">
-                  <Button variant="gold" className="gap-2">
-                    Try ProseAI Free <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </Link>
+              {/* Inline Rewrite */}
+              <div className="rounded-xl border-2 border-gold bg-card p-6 shadow-gold">
+                {!rewriteResult ? (
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      Want this email <span className="text-gradient-gold">rewritten instantly?</span>
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Get a polished, professional version of your email right here — powered by ProseAI.
+                    </p>
+                    <Button variant="gold" className="gap-2" onClick={handleRewrite} disabled={rewriteLoading}>
+                      {rewriteLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+                      {rewriteLoading ? "Rewriting..." : "Rewrite This Email"}
+                    </Button>
+                    {rewriteError && (
+                      <div className="mt-3 flex items-center justify-center gap-2 text-sm text-destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        {rewriteError}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
+                    className="space-y-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="h-4 w-4 text-gold" />
+                        <span className="text-xs font-semibold uppercase tracking-wider text-gold">Polished Version</span>
+                      </div>
+                      <Button variant="ghost" size="sm" className="gap-1.5 text-xs" onClick={handleCopyRewrite}>
+                        {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                        {copied ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                    <div className="rounded-lg border-2 border-gold/30 bg-background p-4">
+                      <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">
+                        {rewriteResult.polished_text}
+                      </p>
+                    </div>
+                    {rewriteResult.corrections.length > 0 && (
+                      <div className="space-y-2">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">What Changed</span>
+                        {rewriteResult.corrections.map((c, i) => (
+                          <div key={i} className="rounded-lg bg-muted/50 p-3 text-sm">
+                            <span className="text-destructive line-through">{c.original}</span>
+                            <span className="text-muted-foreground mx-2">→</span>
+                            <span className="text-green-500 font-medium">{c.improved}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-center gap-3 pt-2">
+                      <Button variant="outline" size="sm" className="gap-1.5" onClick={handleRewrite} disabled={rewriteLoading}>
+                        {rewriteLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                        Rewrite Again
+                      </Button>
+                      <Link to="/coach">
+                        <Button variant="gold" size="sm" className="gap-1.5">
+                          Full Writing Coach <ArrowRight className="h-3.5 w-3.5" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           )}
