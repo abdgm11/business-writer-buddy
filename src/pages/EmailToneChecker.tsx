@@ -17,6 +17,9 @@ import {
   TrendingUp,
   Star,
   Globe,
+  Copy,
+  Check,
+  RefreshCw,
 } from "lucide-react";
 
 interface ToneBreakdown {
