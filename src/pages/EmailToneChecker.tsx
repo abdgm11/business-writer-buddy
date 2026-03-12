@@ -175,6 +175,8 @@ const EmailToneChecker = () => {
     setLoading(true);
     setError("");
     setAnalysis(null);
+    setRewriteResult(null);
+    setRewriteError("");
 
     try {
       const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tone-checker`;
