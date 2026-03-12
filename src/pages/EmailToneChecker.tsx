@@ -104,11 +104,66 @@ const ToneBar = ({ tone, percentage }: ToneBreakdown) => (
   </div>
 );
 
+interface RewriteResult {
+  polished_text: string;
+  corrections: { original: string; improved: string; reason: string }[];
+}
+
 const EmailToneChecker = () => {
   const [text, setText] = useState("");
   const [analysis, setAnalysis] = useState<ToneAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [rewriteResult, setRewriteResult] = useState<RewriteResult | null>(null);
+  const [rewriteLoading, setRewriteLoading] = useState(false);
+  const [rewriteError, setRewriteError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const handleRewrite = async () => {
+    const input = text.trim() || SAMPLE_EMAIL;
+    setRewriteLoading(true);
+    setRewriteError("");
+    setRewriteResult(null);
+
+    try {
+      const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/rewrite`;
+      const res = await fetch(fnUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ text: input, context: "email", tone: "formal" }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setRewriteError(data.message || data.error || "Rewrite failed. Please try again.");
+        return;
+      }
+
+      if (data.polished_text) {
+        setRewriteResult({
+          polished_text: data.polished_text,
+          corrections: data.corrections || [],
+        });
+      } else {
+        setRewriteError("Unexpected response. Please try again.");
+      }
+    } catch {
+      setRewriteError("Network error. Please check your connection.");
+    } finally {
+      setRewriteLoading(false);
+    }
+  };
+
+  const handleCopyRewrite = async () => {
+    if (!rewriteResult) return;
+    await navigator.clipboard.writeText(rewriteResult.polished_text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleAnalyze = async () => {
     const input = text.trim() || SAMPLE_EMAIL;
