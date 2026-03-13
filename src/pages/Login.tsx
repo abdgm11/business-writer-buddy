@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { gtagEvent } from "@/lib/gtag";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Mail, Lock, ArrowRight, Gift, FingerprintPattern } from "lucide-react";
+import { Mail, Lock, ArrowRight, Gift, Fingerprint } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { toast } from "sonner";
