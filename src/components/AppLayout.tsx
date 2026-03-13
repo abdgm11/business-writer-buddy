@@ -29,7 +29,7 @@ export const AppLayout = ({ children }: {children: ReactNode;}) => {
       <aside className="hidden w-64 flex-col border-r bg-sidebar lg:flex">
         <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-6">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-gold">
-            <FingerprintPattern className="h-4 w-4 text-accent-foreground" />
+            <Fingerprint className="h-4 w-4 text-accent-foreground" />
           </div>
           <span className="text-lg font-bold text-sidebar-foreground">
             Prose<span className="text-sidebar-primary">AI</span>
