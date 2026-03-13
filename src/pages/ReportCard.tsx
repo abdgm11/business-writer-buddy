@@ -22,7 +22,7 @@ import {
   CheckCircle2,
   ArrowRight,
   BarChart3,
-  Calendar, FingerprintPattern } from
+  Calendar, Fingerprint } from
 "lucide-react";
 import { Link } from "react-router-dom";
 
