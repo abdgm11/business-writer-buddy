@@ -35,7 +35,7 @@ const StreakCard = ({ streak, streakGoal }: StreakCardProps) => (
             {streak > 0 ? `${streakGoal - streak} days to your ${streakGoal}-day goal!` : "Start your streak by polishing some text!"}
           </p>
         </div>
-        <div className="w-full h-3 rounded-full bg-primary-foreground/10 overflow-hidden">
+        <div className="w-full h-3 rounded-full bg-white/15 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${(streak / streakGoal) * 100}%` }}
@@ -43,7 +43,7 @@ const StreakCard = ({ streak, streakGoal }: StreakCardProps) => (
             className="h-full rounded-full gradient-gold"
           />
         </div>
-        <p className="text-xs text-primary-foreground/50 mt-2">
+        <p className="text-xs text-white/70 mt-2">
           Practice daily to keep your streak. Resets after 24 hours of inactivity.
         </p>
       </div>
