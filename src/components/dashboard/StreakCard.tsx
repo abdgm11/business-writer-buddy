@@ -31,7 +31,7 @@ const StreakCard = ({ streak, streakGoal }: StreakCardProps) => (
       <div className="flex-1 w-full md:w-auto">
         <div className="flex items-center gap-2 mb-2">
           <Zap className="h-4 w-4 text-gold" />
-          <p className="text-sm font-medium text-primary-foreground">
+          <p className="text-sm font-medium text-white">
             {streak > 0 ? `${streakGoal - streak} days to your ${streakGoal}-day goal!` : "Start your streak by polishing some text!"}
           </p>
         </div>
