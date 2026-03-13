@@ -22,10 +22,10 @@ const StreakCard = ({ streak, streakGoal }: StreakCardProps) => (
           <Flame className="h-8 w-8 text-accent-foreground" />
         </div>
         <div>
-          <p className="text-5xl md:text-6xl font-bold text-primary-foreground font-display leading-none">
+          <p className="text-5xl md:text-6xl font-bold text-white font-display leading-none">
             {streak}
           </p>
-          <p className="text-sm text-primary-foreground/70 mt-1">day streak</p>
+          <p className="text-sm text-white/80 mt-1">day streak</p>
         </div>
       </div>
       <div className="flex-1 w-full md:w-auto">
