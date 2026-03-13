@@ -376,7 +376,7 @@ const Landing = () => {
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
           <div className="flex items-center gap-2">
             <div className="flex h-6 w-6 items-center justify-center rounded gradient-navy">
-              <FingerprintPattern className="h-3 w-3 text-gold" />
+              <Fingerprint className="h-3 w-3 text-gold" />
             </div>
             <span className="text-sm font-semibold text-foreground">ProseAI</span>
           </div>
