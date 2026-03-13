@@ -168,8 +168,8 @@ const ReportCard = () => {
           {/* Score Improvement Banner */}
           {stats.scoreImprovement !== null && stats.scoreImprovement > 0 &&
           <div className="gradient-gold px-8 py-4 flex items-center justify-center gap-3">
-              <TrendingUp className="h-5 w-5 text-accent-foreground" />
-              <p className="font-semibold text-accent-foreground text-sm">
+              <TrendingUp className="h-5 w-5 text-foreground" />
+              <p className="font-semibold text-foreground text-sm">
                 Score improved by <span className="text-base">+{stats.scoreImprovement} points</span> since you started!
               </p>
             </div>
