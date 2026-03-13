@@ -93,7 +93,7 @@ const Login = () => {
         <div className="mb-8 text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg gradient-navy">
-              <FingerprintPattern className="h-5 w-5 text-gold" />
+              <Fingerprint className="h-5 w-5 text-gold" />
             </div>
             <span className="text-2xl font-bold text-foreground">
               Prose<span className="text-gold">AI</span>
