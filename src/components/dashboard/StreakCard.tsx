@@ -22,20 +22,20 @@ const StreakCard = ({ streak, streakGoal }: StreakCardProps) => (
           <Flame className="h-8 w-8 text-accent-foreground" />
         </div>
         <div>
-          <p className="text-5xl md:text-6xl font-bold text-primary-foreground font-display leading-none">
+          <p className="text-5xl md:text-6xl font-bold text-white font-display leading-none">
             {streak}
           </p>
-          <p className="text-sm text-primary-foreground/70 mt-1">day streak</p>
+          <p className="text-sm text-white/80 mt-1">day streak</p>
         </div>
       </div>
       <div className="flex-1 w-full md:w-auto">
         <div className="flex items-center gap-2 mb-2">
           <Zap className="h-4 w-4 text-gold" />
-          <p className="text-sm font-medium text-primary-foreground">
+          <p className="text-sm font-medium text-white">
             {streak > 0 ? `${streakGoal - streak} days to your ${streakGoal}-day goal!` : "Start your streak by polishing some text!"}
           </p>
         </div>
-        <div className="w-full h-3 rounded-full bg-primary-foreground/10 overflow-hidden">
+        <div className="w-full h-3 rounded-full bg-white/15 overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${(streak / streakGoal) * 100}%` }}
@@ -43,7 +43,7 @@ const StreakCard = ({ streak, streakGoal }: StreakCardProps) => (
             className="h-full rounded-full gradient-gold"
           />
         </div>
-        <p className="text-xs text-primary-foreground/50 mt-2">
+        <p className="text-xs text-white/70 mt-2">
           Practice daily to keep your streak. Resets after 24 hours of inactivity.
         </p>
       </div>
