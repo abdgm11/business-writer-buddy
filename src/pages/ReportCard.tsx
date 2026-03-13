@@ -22,8 +22,8 @@ import {
   CheckCircle2,
   ArrowRight,
   BarChart3,
-  Calendar,
-} from "lucide-react";
+  Calendar, FingerprintPattern } from
+"lucide-react";
 import { Link } from "react-router-dom";
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -46,24 +46,24 @@ const ReportCard = () => {
     bestScore: stats?.bestScore ?? null,
     avgScore: stats?.avgScore ?? null,
     uniqueContexts: stats?.contextBreakdown.length ?? 0,
-    daysPracticed: stats?.daysPracticed ?? 0,
+    daysPracticed: stats?.daysPracticed ?? 0
   });
 
-  const period = stats
-    ? `${formatDate(stats.firstDate)} – ${formatDate(stats.lastDate)}`
-    : "";
+  const period = stats ?
+  `${formatDate(stats.firstDate)} – ${formatDate(stats.lastDate)}` :
+  "";
 
   const shareText =
-    stats
-      ? `🚀 My ProseAI Writing Report Card\n\n` +
-        `📝 ${stats.totalRewrites} texts polished\n` +
-        `📚 ${stats.wordsPolished.toLocaleString()} words improved\n` +
-        (stats.streak > 0 ? `🔥 ${stats.streak}-day streak\n` : "") +
-        (stats.avgScore ? `📊 Avg score: ${stats.avgScore}/100\n` : "") +
-        (stats.scoreImprovement && stats.scoreImprovement > 0 ? `📈 Score improvement: +${stats.scoreImprovement} pts\n` : "") +
-        (stats.topContext ? `✉️ Top context: ${capitalize(stats.topContext)}\n` : "") +
-        `\nLeveling up my professional English with ProseAI ✨\n\n#BusinessEnglish #ProfessionalDevelopment #ProseAI`
-      : "";
+  stats ?
+  `🚀 My ProseAI Writing Report Card\n\n` +
+  `📝 ${stats.totalRewrites} texts polished\n` +
+  `📚 ${stats.wordsPolished.toLocaleString()} words improved\n` + (
+  stats.streak > 0 ? `🔥 ${stats.streak}-day streak\n` : "") + (
+  stats.avgScore ? `📊 Avg score: ${stats.avgScore}/100\n` : "") + (
+  stats.scoreImprovement && stats.scoreImprovement > 0 ? `📈 Score improvement: +${stats.scoreImprovement} pts\n` : "") + (
+  stats.topContext ? `✉️ Top context: ${capitalize(stats.topContext)}\n` : "") +
+  `\nLeveling up my professional English with ProseAI ✨\n\n#BusinessEnglish #ProfessionalDevelopment #ProseAI` :
+  "";
 
   const shareUrl = window.location.origin;
 
@@ -92,8 +92,8 @@ const ReportCard = () => {
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-[500px] w-full rounded-2xl" />
         </div>
-      </AppLayout>
-    );
+      </AppLayout>);
+
   }
 
   if (!stats || stats.totalRewrites === 0) {
@@ -113,8 +113,8 @@ const ReportCard = () => {
             </Button>
           </Link>
         </div>
-      </AppLayout>
-    );
+      </AppLayout>);
+
   }
 
   return (
@@ -138,109 +138,109 @@ const ReportCard = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="rounded-2xl overflow-hidden shadow-elegant border print:shadow-none"
-        >
+          className="rounded-2xl overflow-hidden shadow-elegant border print:shadow-none">
+          
           {/* Header */}
           <div className="gradient-navy p-8 text-center relative overflow-hidden">
             <div className="absolute inset-0 opacity-5">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Sparkles
-                  key={i}
-                  className="absolute text-gold"
-                  style={{ top: `${15 + i * 15}%`, left: `${10 + i * 16}%`, width: 24, height: 24 }}
-                />
-              ))}
+              {Array.from({ length: 6 }).map((_, i) =>
+              <Sparkles
+                key={i}
+                className="absolute text-gold"
+                style={{ top: `${15 + i * 15}%`, left: `${10 + i * 16}%`, width: 24, height: 24 }} />
+
+              )}
             </div>
             <div className="relative">
               <div className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 px-4 py-1 text-xs text-primary-foreground/70 mb-4">
-                <Sparkles className="h-3 w-3 text-gold" /> ProseAI Report Card
+                <FingerprintPattern className="h-3 w-3 text-gold" /> ProseAI Report Card
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-1">
                 Writing Progress Report
               </h2>
               <p className="text-primary-foreground/60 text-sm">{period}</p>
-              {user?.email && (
-                <p className="text-primary-foreground/40 text-xs mt-1">{user.email}</p>
-              )}
+              {user?.email &&
+              <p className="text-primary-foreground/40 text-xs mt-1">{user.email}</p>
+              }
             </div>
           </div>
 
           {/* Score Improvement Banner */}
-          {stats.scoreImprovement !== null && stats.scoreImprovement > 0 && (
-            <div className="gradient-gold px-8 py-4 flex items-center justify-center gap-3">
+          {stats.scoreImprovement !== null && stats.scoreImprovement > 0 &&
+          <div className="gradient-gold px-8 py-4 flex items-center justify-center gap-3">
               <TrendingUp className="h-5 w-5 text-accent-foreground" />
               <p className="font-semibold text-accent-foreground text-sm">
                 Score improved by <span className="text-base">+{stats.scoreImprovement} points</span> since you started!
               </p>
             </div>
-          )}
+          }
 
           {/* Stats Grid */}
           <div className="bg-card p-6 md:p-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
               {[
-                { icon: FileText, value: stats.totalRewrites.toString(), label: "Texts Polished" },
-                { icon: BookOpen, value: stats.wordsPolished.toLocaleString(), label: "Words Improved" },
-                { icon: Flame, value: stats.streak > 0 ? `${stats.streak} days` : "—", label: "Current Streak" },
-                { icon: Calendar, value: stats.daysPracticed.toString(), label: "Days Practiced" },
-              ].map((s) => (
-                <div key={s.label} className="text-center rounded-xl bg-muted p-4">
+              { icon: FileText, value: stats.totalRewrites.toString(), label: "Texts Polished" },
+              { icon: BookOpen, value: stats.wordsPolished.toLocaleString(), label: "Words Improved" },
+              { icon: Flame, value: stats.streak > 0 ? `${stats.streak} days` : "—", label: "Current Streak" },
+              { icon: Calendar, value: stats.daysPracticed.toString(), label: "Days Practiced" }].
+              map((s) =>
+              <div key={s.label} className="text-center rounded-xl bg-muted p-4">
                   <s.icon className="h-5 w-5 text-gold mx-auto mb-2" />
                   <p className="text-xl font-bold text-foreground font-display">{s.value}</p>
                   <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
                 </div>
-              ))}
+              )}
             </div>
 
             {/* Scores Row */}
-            {(stats.avgScore || stats.bestScore) && (
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {stats.avgScore && (
-                  <div className="rounded-xl border p-5 text-center">
+            {(stats.avgScore || stats.bestScore) &&
+            <div className="grid grid-cols-2 gap-4 mb-8">
+                {stats.avgScore &&
+              <div className="rounded-xl border p-5 text-center">
                     <p className="text-xs font-semibold uppercase tracking-wider text-gold mb-2">Average Score</p>
                     <p className="text-4xl font-bold text-foreground font-display">{stats.avgScore}</p>
                     <p className="text-xs text-muted-foreground mt-1">out of 100</p>
                   </div>
-                )}
-                {stats.bestScore && (
-                  <div className="rounded-xl border p-5 text-center">
+              }
+                {stats.bestScore &&
+              <div className="rounded-xl border p-5 text-center">
                     <p className="text-xs font-semibold uppercase tracking-wider text-gold mb-2">Best Score</p>
                     <p className="text-4xl font-bold text-foreground font-display">{stats.bestScore}</p>
                     <p className="text-xs text-muted-foreground mt-1">personal best</p>
                   </div>
-                )}
+              }
               </div>
-            )}
+            }
 
             {/* Context Breakdown */}
-            {stats.contextBreakdown.length > 0 && (
-              <div className="mb-6">
+            {stats.contextBreakdown.length > 0 &&
+            <div className="mb-6">
                 <h3 className="text-sm font-semibold text-foreground font-sans mb-4 uppercase tracking-wider">
                   Writing Contexts Used
                 </h3>
                 <div className="space-y-3">
                   {stats.contextBreakdown.map((c) => {
-                    const pct = Math.round((c.count / stats.totalRewrites) * 100);
-                    return (
-                      <div key={c.name}>
+                  const pct = Math.round(c.count / stats.totalRewrites * 100);
+                  return (
+                    <div key={c.name}>
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-sm text-foreground capitalize">{c.name}</span>
                           <span className="text-sm font-semibold text-gold">{pct}%</span>
                         </div>
                         <div className="h-2.5 rounded-full bg-muted overflow-hidden">
                           <motion.div
-                            className="h-full rounded-full gradient-gold"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${pct}%` }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                          />
+                          className="h-full rounded-full gradient-gold"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          transition={{ duration: 0.8, delay: 0.2 }} />
+                        
                         </div>
-                      </div>
-                    );
-                  })}
+                      </div>);
+
+                })}
                 </div>
               </div>
-            )}
+            }
 
 
             {/* Badges */}
@@ -264,8 +264,8 @@ const ReportCard = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
-          className="rounded-xl border bg-card p-6 shadow-elegant"
-        >
+          className="rounded-xl border bg-card p-6 shadow-elegant">
+          
           <div className="text-center mb-5">
             <Share2 className="h-6 w-6 text-gold mx-auto mb-3" />
             <h3 className="font-semibold text-foreground font-sans mb-1">Share Your Progress</h3>
@@ -292,8 +292,8 @@ const ReportCard = () => {
           </p>
         </motion.div>
       </div>
-    </AppLayout>
-  );
+    </AppLayout>);
+
 };
 
 export default ReportCard;
