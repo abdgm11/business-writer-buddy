@@ -22,7 +22,7 @@ import {
   CheckCircle2,
   ArrowRight,
   BarChart3,
-  Calendar, FingerprintPattern } from
+  Calendar, Fingerprint } from
 "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -152,15 +152,15 @@ const ReportCard = () => {
               )}
             </div>
             <div className="relative">
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/20 px-4 py-1 text-xs text-primary-foreground/70 mb-4">
-                <FingerprintPattern className="h-3 w-3 text-gold" /> ProseAI Report Card
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/30 px-4 py-1 text-xs text-white/90 mb-4">
+                <Fingerprint className="h-3 w-3 text-gold" /> ProseAI Report Card
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold text-primary-foreground mb-1">
+              <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">
                 Writing Progress Report
               </h2>
-              <p className="text-primary-foreground/60 text-sm">{period}</p>
+              <p className="text-white/80 text-sm">{period}</p>
               {user?.email &&
-              <p className="text-primary-foreground/40 text-xs mt-1">{user.email}</p>
+              <p className="text-white/60 text-xs mt-1">{user.email}</p>
               }
             </div>
           </div>
@@ -168,8 +168,8 @@ const ReportCard = () => {
           {/* Score Improvement Banner */}
           {stats.scoreImprovement !== null && stats.scoreImprovement > 0 &&
           <div className="gradient-gold px-8 py-4 flex items-center justify-center gap-3">
-              <TrendingUp className="h-5 w-5 text-accent-foreground" />
-              <p className="font-semibold text-accent-foreground text-sm">
+              <TrendingUp className="h-5 w-5 text-foreground" />
+              <p className="font-semibold text-foreground text-sm">
                 Score improved by <span className="text-base">+{stats.scoreImprovement} points</span> since you started!
               </p>
             </div>
