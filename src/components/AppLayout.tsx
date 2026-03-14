@@ -97,7 +97,13 @@ export const AppLayout = ({ children }: {children: ReactNode;}) => {
             </nav>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-6 lg:p-8">{children}</main>
+        <main className="flex-1 overflow-auto p-6 lg:p-8">
+          <AnimatePresence mode="wait">
+            <PageTransition key={location.pathname}>
+              {children}
+            </PageTransition>
+          </AnimatePresence>
+        </main>
       </div>
     </div>);
 
