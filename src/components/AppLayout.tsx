@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sparkles, LayoutDashboard, PenTool, BookOpen, Settings, LogOut, Award, HelpCircle, Fingerprint } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PageTransition } from "@/components/PageTransition";
+import { AnimatePresence } from "framer-motion";
 
 const navItems = [
 { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -95,7 +97,13 @@ export const AppLayout = ({ children }: {children: ReactNode;}) => {
             </nav>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-6 lg:p-8">{children}</main>
+        <main className="flex-1 overflow-auto p-6 lg:p-8">
+          <AnimatePresence mode="wait">
+            <PageTransition key={location.pathname}>
+              {children}
+            </PageTransition>
+          </AnimatePresence>
+        </main>
       </div>
     </div>);
 
