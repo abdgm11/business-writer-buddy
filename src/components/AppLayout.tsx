@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sparkles, LayoutDashboard, PenTool, BookOpen, Settings, LogOut, Award, HelpCircle, Fingerprint } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PageTransition } from "@/components/PageTransition";
+import { AnimatePresence } from "framer-motion";
 
 const navItems = [
 { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
