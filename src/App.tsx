@@ -17,6 +17,7 @@ import EmailToneChecker from "./pages/EmailToneChecker";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import GrammarExplainer from "./pages/GrammarExplainer";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
